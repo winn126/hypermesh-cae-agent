@@ -1,0 +1,137 @@
+{
+  "id": "hm17.vehicle_door.full_preprocess",
+  "kind": "procedure",
+  "title": "车门 HyperMesh 前处理端到端工程师—agent 协同流程",
+  "summary": "以阶段门控方式完成车门模型管理、中面抽取、几何清理、包边、网格、网格检查修复和连接创建。agent 只在被授权的阶段执行，工程师保留复杂几何、包边、网格修复和连接最终判断权。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["vehicle_door", "full_workflow", "cad_to_cae", "midsurface", "autocleanup", "baobian", "thickness", "batchmesh", "mesh_check", "connectors", "spot_weld", "glue", "rbe2"],
+  "triggers": ["车门全流程", "车门前处理", "CAD 到 CAE", "完整 HyperMesh 流程", "模型管理 中面抽取 包边 网格 连接"],
+  "scope": {
+    "include": ["vehicle_door", "CAD", "solids", "surfaces", "baobian", "midsurface", "2d_mesh", "connectors"],
+    "exclude": ["loads", "boundary_conditions", "solver_analysis"]
+  },
+  "preconditions": [
+    "工程师已打开目标 HyperMesh 17 模型并连接 MCP。",
+    "已记录输入模型、求解器模板、输出目录、当前阶段和工程师提供的模型专属参数/标准。",
+    "已通过另存为创建本大步骤的工作模型、run 目录和待执行 Tcl 目录；原始输入模型保持不变。",
+    "前一阶段已验收，或工程师已明确放行进入当前阶段。"
+  ],
+  "steps": [
+    "模型管理与组织：agent 导入/读取模型，建立初始清单，统一组件命名、功能分类和配色；将可确认的点焊与胶粘参考几何分别归集到 connector_ref_spot_weld 与 connector_ref_glue，并输出映射与导入导出日志。",
+    "中面抽取：agent 按组件识别未网格化 solids 与 surfaces，判断 surface 是否为单层，再抽取中面并记录来源、厚度证据和例外。",
+    "几何清理：agent 执行低风险 Auto Cleanup 和问题扫描；工程师决定复杂拓扑、关键特征和会影响包边/装配关系的细节清理。",
+    "包边处理：agent 不创建、切割、删除、重构或优化包边；工程师完成包边并明确 baobian、相邻接口、真实外侧边和可修改范围。",
+    "网格划分：agent 对每个批准组件独立执行 BatchMesh；必要时受控回退到 2D mesh/局部 Automesh，读回结果并停止失败组件的重复重试。",
+    "网格检查与修复：agent 检查连通性、网格质量、局部细节和优化候选；工程师决定修复方法，agent 只执行明确批准的局部操作。",
+    "创建 connectors：agent 优先从统一参考 component（兼容旧别名）扫描并展示点焊、胶粘和 RBE2 候选；工程师审核/补加/拒绝，agent 仅提交批准候选，另存为连接阶段结果模型并保存审计。"
+  ],
+  "phase_contracts": [
+    {
+      "phase": 1,
+      "name": "model_management_and_organization",
+      "ownership": "agent_full",
+      "engineer_gate": "naming_or_classification_ambiguity",
+      "exit": "audited_inventory_and_component_mapping"
+    },
+    {
+      "phase": 2,
+      "name": "midsurface_extraction",
+      "ownership": "agent_full",
+      "engineer_gate": "ambiguous_layer_count_or_thickness",
+      "exit": "source_to_midface_and_thickness_mapping"
+    },
+    {
+      "phase": 3,
+      "name": "geometry_cleanup",
+      "ownership": "engineer_operation_with_agent_assist",
+      "engineer_gate": "cleanup_method_and_acceptance",
+      "exit": "meshable_geometry_or_recorded_exceptions"
+    },
+    {
+      "phase": 4,
+      "name": "baobian_processing",
+      "ownership": "engineer_only",
+      "agent_authority": "none",
+      "engineer_gate": "accepted_baobian_and_interface_definition",
+      "exit": "approved_baobian_handoff"
+    },
+    {
+      "phase": 5,
+      "name": "mesh_generation",
+      "ownership": "agent_full",
+      "strategy": "batchmesh_first_2d_mesh_fallback",
+      "engineer_gate": "parameters_and_exceptions",
+      "exit": "per_component_mesh_audit"
+    },
+    {
+      "phase": 6,
+      "name": "mesh_check_and_repair",
+      "ownership": "engineer_operation_with_agent_assist",
+      "engineer_gate": "quality_criteria_and_local_repair_method",
+      "exit": "accepted_mesh_or_open_issue_register"
+    },
+    {
+      "phase": 7,
+      "name": "connectors",
+      "ownership": "engineer_decision_agent_execution",
+      "engineer_gate": "candidate_approval_and_final_submission",
+      "exit": "connector_audit_and_final_model"
+    }
+  ],
+  "execution_contract": {
+    "stage_order": [
+      "model_management_and_organization",
+      "midsurface_extraction",
+      "geometry_cleanup",
+      "baobian_processing",
+      "mesh_generation",
+      "mesh_check_and_repair",
+      "connectors"
+    ],
+    "allowed_states": ["not_started", "agent_running", "scan_complete", "stopped", "engineer_action_required", "engineer_decision_required", "blocked", "accepted"],
+    "stage_skip_policy": "forbidden_without_explicit_engineer_approval",
+    "agent_may_not_accept_engineer_gate": true,
+    "baobian_policy": "engineer_only_until_accepted_then_immutable_reference_mesh",
+    "mesh_policy": "one_component_per_batchmesh_run_with_readback_and_stop_on_failure",
+    "connector_policy": "scan_and_review_only_until_engineer_approved_submission",
+    "scan_process_policy": {
+      "scan_completion_state": "scan_complete",
+      "stop_state": "stopped",
+      "connector_submission_gate": "engineer_decision_required",
+      "connector_scan_never_creates_connectors": true
+    },
+    "connector_reference_components": {
+      "spot_weld": "connector_ref_spot_weld",
+      "glue": "connector_ref_glue"
+    },
+    "connector_reference_component_policy": "one_logical_reference_component_per_connector_type_with_legacy_alias_compatibility",
+    "model_write_policy": "stage_save_as_then_cleanup",
+    "stage_output_naming": "{source_stem}__P{phase}_{operation}__{timestamp_or_session}.hm",
+    "stage_cleanup_policy": "after_acceptance_delete_only_phase_local_before_and_checkpoint_models_recorded_in_manifest",
+    "artifact_policy": ["input_model_reference", "accepted_output_model", "recovery_model", "executed_tcl", "execution_log", "audit_log", "run_manifest", "cleanup_manifest"]
+  },
+  "verification": [
+    "每个阶段都有明确 owner、输入、出口、状态和工程师交接证据。",
+    "agent 没有在包边阶段改动模型，也没有越过工程师门控进入下一阶段。",
+    "批量网格按组件独立执行并具有参数、读回和失败报告。",
+    "网格修复和连接创建均保留工程师审核证据。",
+    "最终 run 目录包含输入/阶段结果模型、Tcl、日志、审计、清理清单和未解决项；原始输入模型未被覆盖。"
+  ],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_workflow_chart",
+      "ref": "conversation:vehicle-door-hypermesh-agent-workflow-2026-08-04"
+    },
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:vehicle-door-agent-collaboration-boundaries"
+    }
+  ],
+  "workflow_order": 1,
+  "updated_at": "2026-08-05"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "hm17.rule.baobian_quad_dominance",
+  "kind": "mesh_rule",
+  "title": "包边网格应保持均匀的四边形主导",
+  "summary": "除几何例外外，包边网格应均匀、贴合并避免突变。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "quad", "uniformity", "geometry_fit"],
+  "triggers": ["四边形主导", "网格均匀", "包边网格优化"],
+  "scope": {"include": ["baobian"], "exclude": []},
+  "preconditions": ["包边范围已确认"],
+  "steps": ["合并过小单元", "分割过大单元", "检查尺寸过渡和几何贴合"],
+  "verification": ["没有新的尺寸突变或非预期自由边"],
+  "rule": {
+    "statement": "包边外轮廓应尽量使用均匀四边形，三角形只在几何例外处保留。",
+    "quality_priority": ["geometry_fit", "connectivity", "element_quality", "uniformity"]
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "engineer_instruction", "ref": "conversation:baobian-quad-dominance"}],
+  "workflow_order": 22,
+  "updated_at": "2026-07-31"
+}

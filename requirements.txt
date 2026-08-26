@@ -1,0 +1,4 @@
+mcp==1.27.1
+# mcp 1.27.1 emits an IncompleteFieldDefinitionWarning with pydantic-settings
+# 2.15.0 under Python 3.13. The preflight treats warnings as startup failures.
+pydantic-settings==2.14.1

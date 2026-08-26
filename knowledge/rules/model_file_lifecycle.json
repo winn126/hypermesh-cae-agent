@@ -1,0 +1,66 @@
+{
+  "id": "hm17.rule.model_file_lifecycle",
+  "kind": "mesh_rule",
+  "title": "阶段化另存为与中间备份清理规则",
+  "summary": "任何会改变模型的大步骤均从输入模型另存为一个带日期、阶段和操作名的新 .hm 文件开始；阶段验收后只清理该阶段内部的临时恢复文件，并保留原始输入、已验收输出及审计证据。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["file_lifecycle", "save_as", "backup", "recovery", "run_artifact", "connector"],
+  "triggers": ["另存为", "保存新文件", "阶段备份", "清理中间备份", "恢复模型", "最终模型"],
+  "scope": {
+    "include": ["hm_model", "run_artifacts", "all_workflow_phases"],
+    "exclude": ["original_input_deletion"]
+  },
+  "preconditions": [
+    "已确定当前阶段编号、操作名称、输入模型路径和 run 目录。",
+    "已记录上一阶段验收状态，或已得到工程师明确放行。",
+    "已有可写的输出目录，且输出路径不会覆盖原始输入模型。"
+  ],
+  "steps": [
+    "进入每个大步骤前，使用另存为创建阶段工作模型，推荐命名：{source_stem}__P{phase}_{operation}__{timestamp_or_session}.hm。",
+    "在同一大步骤内仅在破坏性子操作前创建恢复快照；所有快照都属于该阶段，名称包含 before 或 checkpoint 和同一 session。",
+    "将执行 Tcl、日志、审计、输入模型、阶段工作模型、恢复快照和预期阶段输出写入 run manifest。",
+    "阶段完成后先执行模型/审计验证，再将阶段结果标记为 accepted；连接审核插件的 Apply 操作必须写入新的 P07_connectors 输出模型，而非覆盖被审核输入。",
+    "仅在阶段 accepted 且清理清单已写入 run manifest 后，删除本阶段的 before/checkpoint 临时 .hm 文件；不得删除原始输入、当前 accepted 输出、未完成阶段的恢复快照或任何未列入清单的文件。",
+    "保留原始输入、当前阶段 accepted 输出、Tcl、日志、审计和 manifest；若要合并清理早期阶段 accepted 输出，必须在最终交付验证后取得工程师批准。"
+  ],
+  "verification": [
+    "当前阶段的输入模型未被覆盖，accepted 输出为独立且存在的 .hm 文件。",
+    "run manifest 记录 input、accepted output、恢复快照、清理候选、实际删除清单及保留原因。",
+    "删除操作只影响已验证阶段内的临时 before/checkpoint 文件；原始输入、accepted 输出和审计工件仍存在。",
+    "连接阶段的点焊、胶粘和 RBE2 审计都能追溯到同一个或明确列出的 P07_connectors 输出模型。"
+  ],
+  "rule": {
+    "model_write_policy": "stage_save_as_then_cleanup",
+    "stage_output_naming": "{source_stem}__P{phase}_{operation}__{timestamp_or_session}.hm",
+    "pre_stage_action": "save_as_new_model",
+    "cleanup_timing": "after_stage_verification_and_manifest_recording",
+    "retain": [
+      "original_input_model",
+      "current_accepted_stage_output",
+      "executed_tcl",
+      "execution_log",
+      "audit_log",
+      "run_manifest"
+    ],
+    "delete_only": ["phase_local_before_models", "phase_local_checkpoint_models"],
+    "forbidden": [
+      "overwrite_original_input",
+      "delete_unverified_recovery_model",
+      "delete_accepted_output_before_engineer_approved_final_cleanup",
+      "delete_file_not_listed_in_manifest"
+    ]
+  },
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:stage-save-as-and-backup-cleanup-2026-08-04"
+    }
+  ],
+  "workflow_order": 2,
+  "updated_at": "2026-08-04"
+}

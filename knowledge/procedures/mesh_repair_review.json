@@ -1,0 +1,29 @@
+{
+  "id": "hm17.mesh.repair_review",
+  "kind": "procedure",
+  "title": "网格修复结果工程师复核",
+  "summary": "所有拓扑或节点修改完成后，保留证据并让工程师确认是否接受结果。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "green",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "review", "audit", "rollback"],
+  "triggers": ["网格复核", "修复总结", "审核", "回滚"],
+  "scope": {"include": [], "exclude": []},
+  "preconditions": ["已有修复前后质量和连通性报告"],
+  "steps": [
+    "逐条列出 combine、split、smooth、replace 和节点合并操作",
+    "比较每轮修复前后的质量、自由边、重复单元和节点数量",
+    "对质量没有改善或几何贴合变差的轮次恢复备份",
+    "把工程师决定写入 run manifest，并决定是否生成最终模型"
+  ],
+  "verification": [
+    "Tcl、模型、日志、质量报告和审核决定位于同一 run 目录",
+    "最终置信度和所有回退步骤已明确记录"
+  ],
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "workflow_contract", "ref": "skills/vehicle-door-cae/references/workflow-contract.md"}],
+  "workflow_order": 50,
+  "updated_at": "2026-07-31"
+}

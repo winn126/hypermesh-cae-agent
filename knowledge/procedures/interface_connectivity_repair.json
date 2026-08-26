@@ -1,0 +1,80 @@
+{
+  "id": "hm17.mesh.interface_connectivity",
+  "kind": "procedure",
+  "title": "包边与相邻板件接口连通性修复",
+  "summary": "在 baobian 网格已确认合格的前提下，分别使 neiban 或 waiban 的接口边界贴合 baobian 并形成共节点；不改变 baobian，也不修改接口区域外的网格。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "interface", "connectivity", "replace", "node_merge", "edge-equivalence", "baobian"],
+  "triggers": ["接口不连通", "节点对不上", "包边接口", "replace", "edge equivalence", "共节点", "包边和内外板合并"],
+  "scope": {
+    "include": ["baobian", "neiban_midface", "waiban_midface", "neiban", "waiban"],
+    "exclude": []
+  },
+  "preconditions": [
+    "baobian 已完成局部网格检查，且工程师确认其为不可改动的参考网格。",
+    "只选定一个接口对：baobian + neiban（或 neiban_midface），或 baobian + waiban（或 waiban_midface）。",
+    "已保存接口修复前、按日期和操作命名的恢复 .hm 文件；已记录组件、接口边段和异常自由边基线。",
+    "已区分真实外轮廓、待连接接口和内部异常自由边。"
+  ],
+  "steps": [
+    "隔离单个接口对并把 baobian 自由边分为强内侧接口候选、包边外侧/真实外轮廓排除项和不确定项。只允许强内侧候选进入后续节点匹配；外侧、与外侧段相邻或无法分类的边一律排除。",
+    "检查是否存在有几何面而没有单元的漏网区域；仅对缺网面使用 Automesh 补网，不能以整组件重网格替代。",
+    "只从目标板件已确认接口自由边节点向 baobian 强内侧接口自由边节点建立最近候选表，记录距离、边界分类、边段和一对一状态；逐段比较两侧的边段数、节点数、边方向和局部尺寸，先处理拓扑不对应，不能直接对整个组件执行节点合并。",
+    "仅在目标板件一侧用 combine + split、局部 Automesh 或局部重构消除非必要三角形、明显过小/过大单元和密度突变。局部重划区域应包含问题三角形及相邻过渡单元，但不得扩展到 baobian、包边外侧自由边或接口外区域。",
+    "对每个容差内却未配对的节点，记录最近节点距离、目标/参考边界分类、当前 mark 范围和一对一拓扑状态；先修复目标板件局部网格，不扩大容差。",
+    "对已确认接口对使用 Edge Equivalence；工程师指南中的 1.0 mm 仅可用于该接口的预览，先执行 Preview Equi，确认没有额外候选、外侧候选、三方候选或 baobian 改动风险后才执行 Equivalence。3.0 mm 不得用于自动写入，只能生成工程师审阅距离报告。",
+    "对 equivalence 后残留的错位节点，逐对使用 Edge > Replace，使 neiban/waiban 节点贴向 baobian 对应节点；若节点数仍不相等，返回上一步修改目标板件局部网格。",
+    "检查并删除已确认的重复面/重复单元；发现缺网或新孔洞时先补网，再重新检查接口。",
+    "完成一个目标板件的全部验证后，才开始另一个目标板件；绝不将 baobian、neiban 和 waiban 放入同一次三方 equivalence。"
+  ],
+  "verification": [
+    "接口两侧对应边界的节点数和边段拓扑一致，且 baobian 的网格、节点位置和接口外区域保持不变。",
+    "包边与板件之间没有异常接口自由边；真实外轮廓和包边外侧自由边仍被保留，且没有被用于节点合并。",
+    "不存在重复面、重复单元、孤立节点、漏网区域或因修复产生的新内部自由边。",
+    "局部网格尺寸过渡均匀、几何贴合度未变差；节点数和单元数的变化已写入审计记录。",
+    "审计记录包含强内侧候选/外侧排除项/不确定项、未合并容差内节点的原因和所有局部重划范围。"
+  ],
+  "execution_contract": {
+    "reference_component": "baobian",
+    "reference_mesh_policy": "immutable",
+    "target_processing": "one_neighbor_per_pass",
+    "guide_edge_equivalence_tolerance_mm": 1.0,
+    "equivalence_preview_required": true,
+    "automatic_candidate_scope": "strong_inner_baobian_interface_free_edge_only",
+    "outer_or_ambiguous_edge_policy": "exclude_from_automatic_mutation",
+    "tolerance_escalation_policy": "No automatic mutation above the guide-specific 1.0 mm Preview Equi tolerance. A 3.0 mm search may produce an engineer-review report only.",
+    "baobian_baseline_required": ["node_ids", "node_coordinates", "element_ids", "element_connectivity"],
+    "interface_stage_authority": "This procedure governs the shared-node interface stage after baobian meshing is accepted; earlier baobian repair cards must not reopen baobian edits during this stage.",
+    "replace_direction": "neiban_or_waiban_to_baobian",
+    "forbidden": [
+      "whole_model_equivalence",
+      "three_component_equivalence",
+      "baobian_mesh_edit",
+      "interface_external_mesh_edit",
+      "bulk_merge_without_preview",
+      "outer_free_edge_node_merge",
+      "tolerance_escalation_without_engineer_review"
+    ]
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_document",
+      "ref": "sources/baobian-neiban-waiban-interface-guide.docx"
+    },
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:interface-replace-and-baobian-master"
+    },
+    {
+      "type": "validated_case",
+      "ref": "cases/interface_outer_edge_mismerge_prevention.json"
+    }
+  ],
+  "workflow_order": 30,
+  "updated_at": "2026-08-04"
+}

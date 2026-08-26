@@ -1,0 +1,36 @@
+{
+  "id": "hm17.mesh.baobian_quad_repair",
+  "kind": "procedure",
+  "title": "包边网格四边形主导修复",
+  "summary": "先处理包边区域，除拐角和必要过渡区域外消除三角形并保持网格均匀。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "quad", "triangle", "combine", "split"],
+  "triggers": ["包边", "四边形主导", "三角形修复", "combine", "split"],
+  "scope": {"include": ["baobian"], "exclude": []},
+  "preconditions": [
+    "已完成包边区域识别并确认范围",
+    "已保存包边修复前的恢复模型",
+    "已标记必须保留的拐角或过渡三角形"
+  ],
+  "steps": [
+    "从包边内部非拐角三角形开始，选择相邻且尺寸相近的四边形",
+    "使用 Edit > Element > Combine 合并局部单元",
+    "使用 Edit > Split 在合并区域的中间重新分割，形成规则四边形",
+    "合并或分割明显过小、过大和不均匀的四边形，使尺寸渐变连续",
+    "每轮局部修改后检查几何贴合、自由边和局部质量"
+  ],
+  "verification": [
+    "除已确认的拐角或过渡区域外没有不必要的三角形",
+    "没有新增内部自由边、重复单元或孤立节点",
+    "网格尺寸过渡均匀且没有明显尖角或折叠",
+    "质量不改善或几何贴合变差时恢复上一轮模型"
+  ],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "engineer_instruction", "ref": "conversation:baobian-combine-split"}],
+  "workflow_order": 20,
+  "updated_at": "2026-07-31"
+}

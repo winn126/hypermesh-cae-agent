@@ -1,0 +1,34 @@
+{
+  "id": "hm17.mesh.preflight",
+  "kind": "procedure",
+  "title": "HyperMesh 17 网格修复前置检查",
+  "summary": "在任何网格修复前确认模型、组件、备份和检查范围。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "preflight", "connectivity", "baobian"],
+  "triggers": ["网格检查", "网格修复", "前置检查", "baobian"],
+  "scope": {"include": ["baobian", "neiban_midface", "waiban_midface"], "exclude": []},
+  "preconditions": [
+    "确认当前 HyperMesh 会话和模型路径",
+    "为当前大步骤保存一个恢复模型",
+    "确认要检查的组件和允许的单元类型",
+    "确认质量标准来源；没有标准时不得猜测阈值"
+  ],
+  "steps": [
+    "统计目标组件的节点、单元、三角形、四边形和自由边",
+    "区分正常外轮廓自由边、组件接口自由边和内部异常自由边",
+    "记录重复单元、孤立节点、未连接接口和当前质量失败项",
+    "把统计结果写入本次 run 的检查报告"
+  ],
+  "verification": [
+    "检查统计结果可复现且组件没有重复计数",
+    "确认恢复模型、Tcl 和检查报告都已写入 run 目录"
+  ],
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "engineer_instruction", "ref": "conversation:mesh-repair-workflow"}],
+  "workflow_order": 10,
+  "updated_at": "2026-07-31"
+}

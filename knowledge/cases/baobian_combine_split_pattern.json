@@ -1,0 +1,21 @@
+{
+  "id": "hm17.case.baobian_combine_split",
+  "kind": "engineering_case",
+  "title": "包边不规则三角形的合并再分割",
+  "summary": "将非拐角三角形与邻近四边形合并，再在中部 split，恢复规则且均匀的四边形。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "triangle", "combine", "split", "case"],
+  "triggers": ["梯形", "不规则单元", "三角形合并", "中间分割"],
+  "scope": {"include": ["baobian"], "exclude": []},
+  "preconditions": ["确认问题区域不在必须保留的拐角过渡区"],
+  "steps": ["选择相邻单元", "combine", "在合并区域中部 split", "检查尺寸和质量"],
+  "verification": ["局部四边形形状规则", "没有新增自由边或明显尺寸跳变"],
+  "case_evidence": [{"type": "engineer_review", "ref": "conversation:baobian-element-examples"}],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "workflow_order": 23,
+  "updated_at": "2026-07-31"
+}

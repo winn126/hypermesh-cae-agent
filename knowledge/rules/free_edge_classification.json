@@ -1,0 +1,53 @@
+{
+  "id": "hm17.rule.free_edge_classification",
+  "kind": "mesh_rule",
+  "title": "自由边必须先分类再修复",
+  "summary": "正常外轮廓和接口自由边不能误判为内部异常自由边。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "free_edge", "boundary", "interface", "replace", "baobian", "outer_edge_exclusion"],
+  "triggers": ["内部自由边", "自由边分类", "异常自由边", "外轮廓", "包边内侧自由边", "包边外侧自由边"],
+  "scope": {"include": ["baobian", "neiban", "waiban", "neiban_midface", "waiban_midface"], "exclude": []},
+  "preconditions": [
+    "已知组件真实外轮廓、当前单一接口对和工程师确认的接口带范围。",
+    "已明确 baobian 为不可修改的参考网格，且目标板件只包含当前一个相邻组件。"
+  ],
+  "steps": [
+    "标记正常外轮廓和包边外侧自由边。",
+    "标记工程师确认的包边—目标板件接口带。",
+    "只把同时位于接口带、具有目标侧对应边界、且局部拓扑可一对一对应的 baobian 自由边列为强内侧接口候选。",
+    "将与外侧段相邻或重叠、属于真实外轮廓、存在多对一歧义或无法分类的自由边列为排除项。",
+    "只对强内侧候选提出 Preview Equi、Replace 或目标板件侧拓扑修复；排除项只记录证据，不参与自动修改。"
+  ],
+  "verification": [
+    "正常外轮廓和包边外侧自由边仍存在且不被选为合并对象。",
+    "审计记录分别给出强内侧候选、外侧排除项和不确定项的数量及理由。",
+    "内部异常自由边数量下降，且每次 Replace 都有对应边界与一对一拓扑证据。"
+  ],
+  "rule": {
+    "normal_boundary": "零件真实外轮廓",
+    "interface_boundary": "等待相邻组件对齐的边界",
+    "abnormal_boundary": "不属于上述两类且出现在组件内部的自由边",
+    "strong_inner_interface_candidate": {
+      "all_required": [
+        "位于工程师确认的包边—板件接口带内",
+        "是 baobian 的自由边",
+        "存在目标板件的对应接口边界或节点",
+        "局部节点数和边段方向可形成一对一对应",
+        "不属于真实外轮廓，也不与被排除的外侧自由边段相邻或重叠"
+      ],
+      "exclusion_policy": "只要存在外侧属性、外侧段相邻关系或分类不确定性，就不得进入自动合并、Equivalence 或 Replace 候选。"
+    },
+    "automatic_action": "自动化只生成分类和候选证据；任何外侧或不确定候选均停止该处自动修改并交工程师复核。"
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [
+    {"type": "engineer_instruction", "ref": "conversation:free-edge-classification"},
+    {"type": "engineer_instruction", "ref": "conversation:baobian-inner-edge-filter-2026-08-04"}
+  ],
+  "workflow_order": 33,
+  "updated_at": "2026-08-04"
+}

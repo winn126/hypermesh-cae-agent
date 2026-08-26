@@ -1,0 +1,34 @@
+{
+  "id": "hm17.mesh.global_quality",
+  "kind": "procedure",
+  "title": "整体网格质量与连通性检查",
+  "summary": "包边及其周边接口完成后，对整个模型执行质量和连通性检查。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "quality", "qualityindex", "connectivity", "free_edge"],
+  "triggers": ["整体网格", "质量检查", "qualityindex", "连通性", "自由边"],
+  "scope": {"include": [], "exclude": []},
+  "preconditions": [
+    "包边局部网格和相连接口已经分别检查",
+    "已加载工程师确认的质量标准配置",
+    "已保存全局检查前的恢复模型"
+  ],
+  "steps": [
+    "按已确认标准检查单元质量、尺寸过渡和几何贴合",
+    "检查重复单元、孤立节点、异常内部自由边和非预期断连区域",
+    "按组件和问题类型汇总失败项，不把正常外轮廓列为错误",
+    "为每类问题生成候选修复计划并标注风险"
+  ],
+  "verification": [
+    "输出 machine-readable 质量报告和人工可读摘要",
+    "记录标准版本、阈值来源、检查前后数量和置信度",
+    "未满足标准的结果进入工程师审核，不自动宣称通过"
+  ],
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "engineer_instruction", "ref": "conversation:global-mesh-check"}],
+  "workflow_order": 40,
+  "updated_at": "2026-07-31"
+}

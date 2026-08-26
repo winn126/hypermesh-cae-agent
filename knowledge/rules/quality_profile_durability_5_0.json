@@ -1,0 +1,26 @@
+{
+  "id": "hm17.rule.quality_profile_durability_5_0",
+  "kind": "mesh_rule",
+  "title": "Durability 5.0 网格质量标准入口",
+  "summary": "保存耐久性标准的配置入口；在原始标准文件导入并确认前不激活具体阈值。",
+  "status": "candidate",
+  "provenance": "candidate_experience",
+  "confidence": "red",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "quality", "qualityindex", "durability_5_0"],
+  "triggers": ["durability 5.0", "耐久性标准", "质量标准", "qualityindex"],
+  "scope": {"include": [], "exclude": []},
+  "preconditions": ["工程师提供并确认 Durability 5.0 原始标准文件"],
+  "steps": ["读取原始标准", "记录阈值来源和版本", "由工程师确认后才生成 active 配置"],
+  "verification": ["每个阈值可追溯到原始文件", "报告中标明未确认项"],
+  "rule": {
+    "thresholds_active": false,
+    "threshold_source": "durability_5_0_profile_not_imported",
+    "automatic_quality_decision": false
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "pending_source", "ref": "Durability 5.0 profile"}],
+  "workflow_order": 41,
+  "updated_at": "2026-07-31"
+}

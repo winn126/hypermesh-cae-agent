@@ -1,0 +1,21 @@
+{
+  "id": "hm17.case.interface_replace",
+  "kind": "engineering_case",
+  "title": "接口边界对齐后使用 Replace",
+  "summary": "先让包边和相邻板件的边界拓扑对应，再用 Edge Replace 对齐最外侧边线。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "interface", "replace", "case"],
+  "triggers": ["边线对齐", "edge replace", "节点对不上", "接口共节点"],
+  "scope": {"include": ["baobian", "neiban_midface", "waiban_midface"], "exclude": []},
+  "preconditions": ["两侧边线已经识别且不是正常外轮廓误报"],
+  "steps": ["比较边段数", "必要时 combine + split", "Edge Replace", "按容差合并节点"],
+  "verification": ["接口无异常自由边", "外轮廓不被破坏", "节点和单元差异有记录"],
+  "case_evidence": [{"type": "engineer_review", "ref": "conversation:interface-repair-experience"}],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "workflow_order": 34,
+  "updated_at": "2026-07-31"
+}

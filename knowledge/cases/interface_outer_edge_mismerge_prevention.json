@@ -1,0 +1,49 @@
+{
+  "id": "hm17.case.interface_outer_edge_mismerge_prevention",
+  "kind": "engineering_case",
+  "title": "防止包边外侧自由边被误合并",
+  "summary": "在包边—板件共节点处理中，最近节点或宽容差搜索会把包边外侧自由边误带入候选。自动化必须只使用强内侧接口自由边，并先让目标板件侧的拓扑一对一对应。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "interface", "free_edge", "outer_edge", "node_merge", "replace", "tolerance"],
+  "triggers": ["包边外侧自由边", "最近节点合并", "3 mm 容差", "节点没有合并", "baobian waiban 共节点"],
+  "scope": {
+    "include": ["baobian", "neiban", "waiban", "neiban_midface", "waiban_midface"],
+    "exclude": ["baobian_outer_free_edge", "physical_outer_boundary"]
+  },
+  "preconditions": [
+    "baobian 已作为不可修改的参考网格固定基线。",
+    "一次只处理 baobian 与一个目标板件接口。",
+    "已确认接口带、真实外轮廓和包边外侧自由边。"
+  ],
+  "steps": [
+    "将 baobian 自由边分类为强内侧接口候选、外侧排除项和不确定项。",
+    "仅为强内侧候选寻找目标板件的最近对应节点，并要求局部节点数、边段数和方向可一对一对应。",
+    "发现目标板件连接处有非拐角三角形或明显尺寸突变时，先在目标板件局部扩大区域执行 Combine + Split 或 Automesh，重新建立节点数对应。",
+    "按 1.0 mm 进行已确认接口的 Preview Equi；预览出现外侧、三方或不确定候选时停止。",
+    "仅对经验证的残余节点逐对 Replace，方向为目标板件贴向 baobian。",
+    "将 3.0 mm 或更大的距离仅输出为工程师审阅报告，不用于自动 Equivalence 或 Replace。"
+  ],
+  "verification": [
+    "包边外侧自由边和真实外轮廓自由边未进入任何合并或 Replace 清单。",
+    "每一个写入候选都有接口带、对应目标节点、距离、一对一拓扑和方向证据。",
+    "baobian 节点、单元、几何和接口外区域与基线一致。",
+    "容差内未合并节点均带有明确原因，而不是通过放大容差被强制处理。"
+  ],
+  "case_evidence": [
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:baobian-inner-edge-filter-and-3mm-tolerance-2026-08-04"
+    },
+    {
+      "type": "workflow_observation",
+      "ref": "conversation:outer-edge-nearest-node-mismerge-risk-2026-08-04"
+    }
+  ],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "workflow_order": 31,
+  "updated_at": "2026-08-04"
+}

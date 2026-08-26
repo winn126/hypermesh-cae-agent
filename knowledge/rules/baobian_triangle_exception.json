@@ -1,0 +1,26 @@
+{
+  "id": "hm17.rule.baobian_triangle_exception",
+  "kind": "mesh_rule",
+  "title": "包边三角形只允许出现在拐角或必要过渡区",
+  "summary": "非拐角三角形进入 combine + split 候选，拐角三角形需要保留理由。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "triangle", "corner", "combine", "split"],
+  "triggers": ["包边三角形", "拐角三角形", "三角形例外"],
+  "scope": {"include": ["baobian"], "exclude": []},
+  "preconditions": ["已识别包边外轮廓和拐角区域"],
+  "steps": ["标记拐角例外", "为非拐角三角形选择相邻四边形并规划 combine + split"],
+  "verification": ["每个保留三角形都有拐角或过渡证据"],
+  "rule": {
+    "statement": "包边除拐角和必要过渡区域外应保持四边形主导。",
+    "allowed_exception": "真实几何拐角或无法避免的短过渡区域",
+    "automatic_action": "仅生成候选，不绕过工程师复核"
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [{"type": "engineer_instruction", "ref": "conversation:baobian-triangle-rule"}],
+  "workflow_order": 21,
+  "updated_at": "2026-07-31"
+}

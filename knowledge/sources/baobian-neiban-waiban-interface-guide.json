@@ -1,0 +1,49 @@
+{
+  "id": "hm17.source.baobian_neiban_waiban_interface_guide",
+  "kind": "source",
+  "title": "包边和内外板合并指南（工程师原始资料）",
+  "summary": "面向 baobian 与 neiban/waiban 的共节点接口修复指南：先补齐漏网，再按单个板件接口预览并执行 edge equivalence，最后用 Replace 逐点消除残留错位并检查自由边。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "baobian", "neiban", "waiban", "interface", "edge-equivalence", "replace", "shared-node"],
+  "triggers": ["包边和内外板合并", "包边共节点", "edge equivalence", "edge-equivalence", "replace", "baobian neiban", "baobian waiban"],
+  "scope": {
+    "include": ["baobian", "neiban", "waiban", "neiban_midface", "waiban_midface"],
+    "exclude": []
+  },
+  "preconditions": [
+    "已确认 baobian 为参考网格，且一次只处理 baobian 与一个相邻板件的接口。",
+    "已建立按日期和操作命名的恢复 .hm 文件，并保留待执行 Tcl。",
+    "已识别真实外轮廓、接口边界和内部异常自由边。"
+  ],
+  "steps": [
+    "先在存在几何面但缺少单元的位置，仅对该面使用 Automesh 补网。",
+    "选择 baobian 与 neiban 或 waiban 的单个组件对；指南截图给出的 1.0 mm 仅用于该已确认接口，必须先执行 Preview Equi、核对候选并经工程师复核后才可执行 Equivalence，绝不是全局默认值。",
+    "对 equivalence 后仍未对齐的节点，使用 Replace 逐对贴合，方向为相邻板件贴向 baobian。",
+    "完成一个板件的补网、对齐和自由边检查后，再处理另一个板件。"
+  ],
+  "verification": [
+    "包边与板件之间不保留异常接口自由边。",
+    "真实外轮廓自由边仍然保留，且没有漏网、重复单元或孤立节点。",
+    "baobian 以外的区域未被误修改，节点和单元变化可审计。"
+  ],
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_document",
+      "ref": "sources/baobian-neiban-waiban-interface-guide.docx",
+      "sha256": "DC39611C371EDD9E3C22E27415D6B98D0821DF6CF42AAE2378E519407527E87E"
+    },
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:baobian-board-shared-node-experience"
+    }
+  ],
+  "source_file": "sources/baobian-neiban-waiban-interface-guide.docx",
+  "source_sha256": "DC39611C371EDD9E3C22E27415D6B98D0821DF6CF42AAE2378E519407527E87E",
+  "workflow_order": 29,
+  "updated_at": "2026-08-03"
+}

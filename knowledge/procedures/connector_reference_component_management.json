@@ -1,0 +1,63 @@
+{
+  "id": "hm17.connectors.reference_component_management",
+  "kind": "procedure",
+  "title": "点焊和胶粘参考几何的统一组件管理",
+  "summary": "在连接扫描前，将可确认的点焊标记/参考点和胶粘标记/参考面分别归集到一个专用 component；不移动真实板件网格、结构件或已经实现的连接器。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["connector", "spot_weld", "glue", "reference_component", "model_management"],
+  "triggers": ["点焊参考组件", "胶粘参考组件", "统一参考 component", "connector_ref_spot_weld", "connector_ref_glue", "焊点胶粘归集"],
+  "scope": {
+    "include": ["connectors", "reference_geometry", "spot_weld", "glue"],
+    "exclude": ["panel_mesh", "realized_connectors"]
+  },
+  "preconditions": [
+    "已记录参考几何原始 component、实体类型、数量和候选扫描用途。",
+    "已另存为当前模型管理阶段的工作模型；原始输入模型不得被覆盖。",
+    "已能够区分参考点/标记几何与承载连接的板件网格。"
+  ],
+  "steps": [
+    "清点所有点焊标记实体、关联参考点、胶粘标记面/实体及其原始 component；先记录 ID 与数量，再执行任何归集。",
+    "复用或创建一个点焊参考 component，标准名称为 connector_ref_spot_weld；只将已确认的点焊标记实体和参考点归入其中。",
+    "复用或创建一个胶粘参考 component，标准名称为 connector_ref_glue；只将已确认的胶粘标记面、环或参考实体归入其中。",
+    "当原 component 同时包含点焊、胶粘或其他参考物时，仅在实体语义可明确判断时自动转移；无法可靠分类的对象保持原位并交由工程师手工归类。",
+    "不得为了归集而移动 FE 板件网格、真实结构件、已经创建的 connector、属性或载荷实体；归集只改变参考几何的 collector 归属。",
+    "启动连接插件时优先传入标准名称，同时兼容已有 cankao、hanjie、(GL) 和（GL）名称；扫描后把使用的参考 component、实体数量和未归集项写入 run manifest。"
+  ],
+  "verification": [
+    "点焊和胶粘各自至多有一个已确认的逻辑参考 component，且其名称、ID 与实体数量已记录。",
+    "点焊扫描能够从 connector_ref_spot_weld 或兼容旧别名发现标记；胶粘扫描能够从 connector_ref_glue 或兼容旧别名发现标记。",
+    "承载连接的板件网格、真实结构组件、已实现 connectors 和属性的 component 归属未被改变。",
+    "存在语义不明的参考实体时，run manifest 中有未归集清单和工程师处理状态。"
+  ],
+  "reference_component_contract": {
+    "canonical_names": {
+      "spot_weld": "connector_ref_spot_weld",
+      "glue": "connector_ref_glue"
+    },
+    "legacy_aliases": {
+      "spot_weld": ["cankao", "hanjie"],
+      "glue": ["(GL)", "（GL）"]
+    },
+    "automatic_move_policy": "only_unambiguous_reference_entities",
+    "manual_fallback": "engineer_classifies_ambiguous_reference_entities",
+    "forbidden": [
+      "move_panel_mesh",
+      "move_structural_component",
+      "move_realized_connector",
+      "delete_unknown_reference_geometry"
+    ]
+  },
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:connector-reference-component-consolidation-2026-08-04"
+    }
+  ],
+  "workflow_order": 12,
+  "updated_at": "2026-08-04"
+}

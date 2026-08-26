@@ -1,0 +1,83 @@
+{
+  "id": "hm17.rule.node_merge_tolerance",
+  "kind": "mesh_rule",
+  "title": "节点合并容差必须按接口范围确认",
+  "summary": "节点合并只能在已确认的接口候选对内执行。包边指南中的 1.0 mm 是 baobian 与单个相邻板件的预览容差，不是全局默认值。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "yellow",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "node_merge", "tolerance", "replace", "connectivity", "edge-equivalence"],
+  "triggers": ["节点合并", "容差", "节点对不上", "replace", "edge equivalence", "1 mm"],
+  "scope": {
+    "include": [],
+    "exclude": []
+  },
+  "preconditions": [
+    "已区分接口节点与真实外轮廓节点，并确认当前模型单位为 mm。",
+    "已选择单个接口对并完成边段/节点对应关系检查。",
+    "已保存恢复模型，且可以在合并后立即复查自由边和节点数量。",
+    "待合并的 baobian 节点已通过强内侧接口自由边分类；外侧或不确定边节点不在候选集中。"
+  ],
+  "steps": [
+    "统计接口候选节点对，按组件和边界分段；对每个未匹配节点记录最近节点距离、边界分类、mark 范围和一对一拓扑状态。",
+    "若节点在距离容差内却未匹配，先判定其是否落在正确组件、强内侧接口边、当前命令 mark 和唯一配对关系中；任一条件不满足时，回到目标板件侧拓扑修复。",
+    "先修复节点数或边段数不对应的问题，不得把距离条件当成拓扑对应关系的替代。",
+    "对于 baobian 与 neiban 或 waiban 的单个已确认接口，可按工程师指南以 1.0 mm 运行 Edge Equivalence 的 Preview Equi。",
+    "仅当预览候选完全落在该接口、不会改变 baobian 且没有误合并真实外轮廓时，才在工程师复核下执行 Equivalence。",
+    "对剩余个别错位使用 Replace，使目标板件贴向 baobian；合并后马上检查自由边、重复单元和节点数量。"
+  ],
+  "verification": [
+    "没有跨组件误合并、三方误合并或真实外轮廓误合并。",
+    "接口异常自由边减少或消失，正常外轮廓自由边仍被保留。",
+    "baobian 网格和接口以外区域未改变，前后差异已记录。"
+  ],
+  "rule": {
+    "statement": "容差必须由当前接口、模型单位和工程师标准确定；示例值不能作为全局默认。",
+    "guide_specific_value": {
+      "value_mm": 1.0,
+      "scope": "仅 baobian 与一个 neiban/waiban 接口对",
+      "purpose": "Edge Equivalence 预览后、经复核的受控执行",
+      "active": true,
+      "global_default": false,
+      "preview_required": true
+    },
+    "tolerance_escalation": {
+      "automatic_mutation_allowed": false,
+      "3.0_mm_policy": "3.0 mm 不得用于自动 Equivalence 或 Replace。仅可作为工程师审阅距离报告的上限，且仍需应用强内侧边界筛选。",
+      "reason": "较大距离搜索会把几何上接近但不属于接口的包边外侧自由边引入候选。"
+    },
+    "candidate_mapping": {
+      "target_source": "当前目标板件的已确认接口自由边节点",
+      "reference_search_set": "baobian 的强内侧接口自由边节点，明确排除包边外侧自由边和真实外轮廓",
+      "required_audit_fields": ["target_node", "reference_node", "distance_mm", "boundary_classification", "edge_segment", "one_to_one_status"],
+      "replace_direction": "target_panel_node_to_baobian_node",
+      "ambiguous_mapping_action": "不执行合并；在目标板件侧进行局部 Combine、Split 或 Automesh 后重新匹配。"
+    },
+    "unmerged_within_tolerance_reasons": [
+      "最近参考节点属于包边外侧自由边、真实外轮廓或非接口内部节点",
+      "两侧节点数、边段数或方向不一致，无法形成一对一配对",
+      "候选在当前组件或 node mark 范围之外",
+      "存在多对一或一对多歧义，自动合并会改变拓扑"
+    ],
+    "automatic_action": "禁止全局批量合并和自动放大容差；只可生成已分段的候选和预览证据，最终执行需要工程师复核。"
+  },
+  "risk": "high",
+  "requires_engineer_review": true,
+  "evidence": [
+    {
+      "type": "engineer_document",
+      "ref": "sources/baobian-neiban-waiban-interface-guide.docx"
+    },
+    {
+      "type": "engineer_instruction",
+      "ref": "conversation:node-tolerance-and-manual-alignment"
+    },
+    {
+      "type": "validated_case",
+      "ref": "cases/interface_outer_edge_mismerge_prevention.json"
+    }
+  ],
+  "workflow_order": 32,
+  "updated_at": "2026-08-04"
+}

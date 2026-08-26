@@ -1,0 +1,21 @@
+{
+  "id": "hm17.case.quality_regression_stop",
+  "kind": "engineering_case",
+  "title": "质量不改善时停止迭代并回滚",
+  "summary": "修复操作如果没有改善质量或破坏几何贴合，应停止继续试错并交工程师判断。",
+  "status": "active",
+  "provenance": "engineer_confirmed",
+  "confidence": "green",
+  "hm_versions": ["17"],
+  "tags": ["mesh", "quality", "rollback", "review", "case"],
+  "triggers": ["质量不改善", "回滚", "死循环", "停止修复"],
+  "scope": {"include": [], "exclude": []},
+  "preconditions": ["已有每轮修复前后的质量和连通性报告"],
+  "steps": ["比较质量指标", "检查几何贴合", "达到最大迭代次数或发生回归时恢复备份", "输出工程师问题"],
+  "verification": ["运行记录包含停止原因和恢复模型", "没有以失败质量结果宣称完成"],
+  "case_evidence": [{"type": "engineer_review", "ref": "conversation:mesh-repair-stability"}],
+  "risk": "medium",
+  "requires_engineer_review": true,
+  "workflow_order": 51,
+  "updated_at": "2026-07-31"
+}
