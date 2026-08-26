@@ -9,6 +9,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module Microsoft.PowerShell.Utility -ErrorAction Stop
 
+function Test-IsRootGitMetadataRelativePath {
+    param([Parameter(Mandatory = $true)][string]$RelativePath)
+
+    $normalized = $RelativePath.Replace('/', '\').TrimStart('\', '/')
+    return $normalized -match '^(?i:\.git)(?:\\|$)'
+}
+
 function Test-ForbiddenRelativePath {
     param([Parameter(Mandatory = $true)][string]$RelativePath)
 
@@ -153,6 +160,9 @@ try {
     $violations = @()
     Get-ChildItem -LiteralPath $root -Recurse -Force -File | ForEach-Object {
         $relativePath = $_.FullName.Substring($root.Length).TrimStart('\', '/')
+        if (Test-IsRootGitMetadataRelativePath -RelativePath $relativePath) {
+            return
+        }
         $reason = Test-ForbiddenRelativePath -RelativePath $relativePath
         if ($null -eq $reason -and -not (Test-AllowedRelativePath -RelativePath $relativePath)) {
             $reason = 'outside-release-whitelist'
@@ -194,6 +204,10 @@ try {
                         $manifestFileErrors += "invalid manifest file path: $entryPath"
                         continue
                     }
+                    if (Test-IsRootGitMetadataRelativePath -RelativePath $entryPath) {
+                        $manifestFileErrors += "reserved Git metadata path: $entryPath"
+                        continue
+                    }
                     if ($entryPath -match '(^|[\\/])\.\.([\\/]|$)' -or $entryPath.StartsWith('\') -or $entryPath.StartsWith('/')) {
                         $manifestFileErrors += "unsafe manifest file path: $entryPath"
                         continue
@@ -213,7 +227,10 @@ try {
                 $actualFiles = @(
                     Get-ChildItem -LiteralPath $root -Recurse -Force -File |
                         ForEach-Object { $_.FullName.Substring($root.Length).TrimStart('\', '/').Replace('\', '/') } |
-                        Where-Object { $_ -ne 'RELEASE-MANIFEST.json' }
+                        Where-Object {
+                            $_ -ne 'RELEASE-MANIFEST.json' -and
+                            -not (Test-IsRootGitMetadataRelativePath -RelativePath $_)
+                        }
                 )
                 foreach ($actualPath in $actualFiles) {
                     if ($manifestPaths -notcontains $actualPath) {

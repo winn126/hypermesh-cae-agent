@@ -148,7 +148,7 @@
                   },
                   {
                       "path":  "scripts/verify-package.ps1",
-                      "sha256":  "AE494C976961DF96B552E3FE10DB7A3A09357061E1D31A69351588079B5059B1"
+                      "sha256":  "7209A4A55928BCEAB19E0D6EB2D49675C86D1A204A52C12A847B95B4A11D5986"
                   },
                   {
                       "path":  "skills/vehicle-door-cae/references/baobian-board-interface-guide.md",
