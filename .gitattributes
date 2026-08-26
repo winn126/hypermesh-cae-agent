@@ -1,2 +1,3 @@
 # The release manifest hashes the exact bytes shipped to target workstations.
-* text=auto eol=lf
+# Do not normalize line endings when the portable package is cloned from Git.
+* -text
