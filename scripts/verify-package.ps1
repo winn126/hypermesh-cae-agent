@@ -13,7 +13,7 @@ function Test-IsRootGitMetadataRelativePath {
     param([Parameter(Mandatory = $true)][string]$RelativePath)
 
     $normalized = $RelativePath.Replace('/', '\').TrimStart('\', '/')
-    return $normalized -match '^(?i:\.git)(?:\\|$)'
+    return $normalized -match '^(?i:\.git)(?:\\|$)' -or $normalized -ieq '.gitattributes'
 }
 
 function Test-ForbiddenRelativePath {

@@ -1,0 +1,2 @@
+# The release manifest hashes the exact bytes shipped to target workstations.
+* text=auto eol=lf
