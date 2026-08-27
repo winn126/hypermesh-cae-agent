@@ -213,7 +213,7 @@ def build_circular_rbe2_candidates(
         try:
             fitted.append(fit_circular_free_edge_loop(loop))
         except ValueError as exc:
-            # Real vehicle models can include collapsed/collinear free-edge
+            # Large production models can include collapsed/collinear free-edge
             # loops around seam details.  They cannot define a circle, so do
             # not let one bad loop abort the read-only review scan.
             skipped_loops.append({
@@ -740,8 +740,8 @@ def analyze_circular_rbe2_candidates_gui(
     if tolerance <= 0.0:
         raise ValueError("center_tolerance must be positive.")
     report_path = _ensure_runs_dir() / f"circular_rbe2_gui_scan_{time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.txt"
-    # Free-edge topology traversal can take tens of seconds on a full door
-    # mesh.  Queue it so the GUI listener can acknowledge immediately instead
+    # Free-edge topology traversal can take tens of seconds on a large mesh.
+    # Queue it so the GUI listener can acknowledge immediately instead
     # of holding one synchronous socket connection open for the whole scan.
     gui_result = execute_tcl_gui_async(
         script=circular_rbe2_free_edge_scan_tcl(report_path),

@@ -1,194 +1,194 @@
-﻿{
-    "schema_version":  1,
-    "package_name":  "hypermesh-cae-agent",
-    "package_version":  "0.5.6+codex.20260825",
-    "created_utc":  "2026-08-25T12:29:39.2696540Z",
-    "source_root":  "\u003cpackage-root\u003e",
-    "file_count":  44,
-    "required_entrypoints":  [
-                                 ".codex-plugin/plugin.json",
-                                 "scripts/install-local.ps1",
-                                 "scripts/start-hypermesh-mcp.ps1",
-                                 "backend/hypermesh-runtime/hypermesh_mcp_server.py",
-                                 "backend/hypermesh-runtime/connector_review_panel.tcl"
-                             ],
-    "installation_contract":  [
-                                  "Target computer supplies Codex, Python, and HyperMesh.",
-                                  "scripts/install-local.ps1 creates a target-local virtual environment and configures Codex.",
-                                  "No source-machine path, model, result, runtime log, test, offline wheel, or development document is included."
-                              ],
-    "files":  [
-                  {
-                      "path":  ".codex-plugin/plugin.json",
-                      "sha256":  "5B512F4AF0BBB67F16E60C29AA9446A5342F184B99512D53B74E0378EC9AD2EE"
-                  },
-                  {
-                      "path":  "ARCHITECTURE.md",
-                      "sha256":  "AC7D940412F07D1AC431E1F6240908BAC5168C158720DC0161AEF33237F09BB6"
-                  },
-                  {
-                      "path":  "backend/hypermesh-runtime/connector_review_panel.tcl",
-                      "sha256":  "92C40465760E0D22867562347E500F4C1EEA3F9028404B002C06AD171782D5E5"
-                  },
-                  {
-                      "path":  "backend/hypermesh-runtime/hypermesh_mcp_server.py",
-                      "sha256":  "2AF004E31D078B463660477D71A36B037FB41D404772F1CAB45B299C61C70C61"
-                  },
-                  {
-                      "path":  "backend/knowledge_runtime/__init__.py",
-                      "sha256":  "BAB50A85F295BF5E605871DB307E254FF457FEA84F64066525CC4E56B3C0B41F"
-                  },
-                  {
-                      "path":  "backend/knowledge_runtime/router.py",
-                      "sha256":  "9D5177A6FA4497158F7B801CF60D3D5AFA54C96459486F51EE96CD5D29224BA6"
-                  },
-                  {
-                      "path":  "backend/knowledge_runtime/store.py",
-                      "sha256":  "3C7BF261C0D12585299C375F0D12DFFC2B514403CA8ED110C85FD1979D7C41CB"
-                  },
-                  {
-                      "path":  "knowledge/cases/baobian_combine_split_pattern.json",
-                      "sha256":  "7AAB8382DC2BC5A31D4FC6837FFDA2669C70A957E95566BF5B26D728A5747260"
-                  },
-                  {
-                      "path":  "knowledge/cases/interface_outer_edge_mismerge_prevention.json",
-                      "sha256":  "76F18283A4292D1EDF9C530C178F38BFB824138A3831B27346EDD8D67E03618B"
-                  },
-                  {
-                      "path":  "knowledge/cases/interface_replace_after_boundary_alignment.json",
-                      "sha256":  "0ABEDBC318404F82CACABC6A1A0C6EBC7A302224DF1165A53FE218A16AB2E2AC"
-                  },
-                  {
-                      "path":  "knowledge/cases/quality_regression_stop_and_review.json",
-                      "sha256":  "4D7010EA1EBB23279A31C1C94EC903C09F33317BA041F231836067475C803C87"
-                  },
-                  {
-                      "path":  "knowledge/manifest.json",
-                      "sha256":  "BE7175D0C170CAB7FF85710E2CCC60DCF11938A8C4087773B03F2FE563A842B3"
-                  },
-                  {
-                      "path":  "knowledge/procedures/baobian_quad_dominance_repair.json",
-                      "sha256":  "A14076AB6D15B97443382758764AD8A8E9464F040B776AEB2CC0B02106807D16"
-                  },
-                  {
-                      "path":  "knowledge/procedures/connector_reference_component_management.json",
-                      "sha256":  "5EA5F8C11327C37F3F7AEC189E244DB74126E04946C22A2143D0094FE66C5E36"
-                  },
-                  {
-                      "path":  "knowledge/procedures/global_mesh_quality_check.json",
-                      "sha256":  "747917CB68098C793BE37A804020EBB05F9F798B1312659D52E8E86E1CDACE5D"
-                  },
-                  {
-                      "path":  "knowledge/procedures/interface_connectivity_repair.json",
-                      "sha256":  "E2742A25AE23D32C874387AFF7A11B80B45A762F35675DB9E5A90B7C5473BF8A"
-                  },
-                  {
-                      "path":  "knowledge/procedures/mesh_preflight.json",
-                      "sha256":  "B1912284C435E223B90FD8EE095EA9C89850A9A136EF25B67BCFB1DC2DF56509"
-                  },
-                  {
-                      "path":  "knowledge/procedures/mesh_repair_review.json",
-                      "sha256":  "54E17F57CFD5BA94156E11EF2F23F31DD3C6531283FEFE231C199B9D9C219BD0"
-                  },
-                  {
-                      "path":  "knowledge/procedures/vehicle_door_full_preprocess_workflow.json",
-                      "sha256":  "0FEE1485168A8AC32876B5002DABB8615283240E965CEF4C5D2FB58015D84BD8"
-                  },
-                  {
-                      "path":  "knowledge/rules/baobian_quad_dominance.json",
-                      "sha256":  "E8C11BA80E0512EE5B8ADC4B47C58F7B864ADF0E6145871BCCDE6D4522176306"
-                  },
-                  {
-                      "path":  "knowledge/rules/baobian_triangle_exception.json",
-                      "sha256":  "A7E2B0F12E5E7A6341A9311CE87BA9B6B33938712876B2B523C5399B12FB512F"
-                  },
-                  {
-                      "path":  "knowledge/rules/free_edge_classification.json",
-                      "sha256":  "98F415A3CC1F40398BF2ADE459FEB6315EFF07682F45AF9D318A805A397C7ED1"
-                  },
-                  {
-                      "path":  "knowledge/rules/model_file_lifecycle.json",
-                      "sha256":  "9FC80F114620B95F80B069C42AA36664F24DEBD913556E75222AC974110D5D8E"
-                  },
-                  {
-                      "path":  "knowledge/rules/node_merge_tolerance.json",
-                      "sha256":  "3959884F273E8D6E17D17F8A7D4DE4477F9AD22BF21B5E4BBE65CA4DE72009FA"
-                  },
-                  {
-                      "path":  "knowledge/rules/quality_profile_durability_5_0.json",
-                      "sha256":  "2C4D7F359049ED91D324264E9DAAB96F40D3749E50ECB2F4E37AF89A5F6B9C7D"
-                  },
-                  {
-                      "path":  "knowledge/sources/baobian-neiban-waiban-interface-guide.json",
-                      "sha256":  "7C887F8EAC1B35B59B9C99D4300EDA9BBC1CA279B9E7B172DAEE42ADC993F029"
-                  },
-                  {
-                      "path":  "README.md",
-                      "sha256":  "034EB3A1B08C7067BF541FC5B086EFED9CA7E5345E3EC1E113AA9D5F55287681"
-                  },
-                  {
-                      "path":  "requirements.txt",
-                      "sha256":  "14ED7E0275FE70EF8A9B1170D2BF1F53E477953A2E23DB4B8831FC8F2822A560"
-                  },
-                  {
-                      "path":  "scripts/check-environment.ps1",
-                      "sha256":  "80C17966DFF3798DA6CA54203CB36D578D83BBA7472B3D3908D936EA8EFC0384"
-                  },
-                  {
-                      "path":  "scripts/create-codex-mcp-snippet.ps1",
-                      "sha256":  "6A052E8EE34B836D86992DEBD5183A161E189C6ACCC2B5E0201EE47F3010AACD"
-                  },
-                  {
-                      "path":  "scripts/install-local.ps1",
-                      "sha256":  "14B08872DF5E2F3E3CCE8F23EA2D506648EEC8DAAAB4E6FEBEA33FD929608908"
-                  },
-                  {
-                      "path":  "scripts/start-hypermesh-mcp.ps1",
-                      "sha256":  "740D07FB7AD52228E465B81AB87808E5B03497A7C87725F3FED76BB659AD8BDD"
-                  },
-                  {
-                      "path":  "scripts/verify-package.ps1",
-                      "sha256":  "FE796B06D5731CB3FEE910CF9472E03BE067034ECE8D384918FA71D4B721B96D"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/baobian-board-interface-guide.md",
-                      "sha256":  "B1952CD99E6F32E49C15F2D236F6D7974A2AF30AC6F22DAF8516509A77338C5C"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/baobian-interface-node-merge-guide.md",
-                      "sha256":  "B27C084E894D8F22905F282002777D17090E328EE6CF7FC61892974B3AD216C5"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/component-visual-palette.md",
-                      "sha256":  "1C1C8C0923C320EE5E8FB5998DBDBCD7D07BE05C53E79017CEC2C9173C7483C3"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/connector-reference-components-and-file-lifecycle.md",
-                      "sha256":  "3E77408C72ADA4C9F7FBB9FD2D1F078D80FFA59401B1E4E7F051C313BA859B3A"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/hypermesh17-constraints.md",
-                      "sha256":  "9873B32EE715DF823CB6EBCE7D116D401EE198C2CB4FED78F1302AE6F4441258"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/rbe2-review-lessons.md",
-                      "sha256":  "3675788DB40431DAE45466DE9AAF68AEB29C585E81B34294F5A1AB48C7EBDC01"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/vehicle-door-full-workflow.md",
-                      "sha256":  "365A6DE8E00A771AB976F362B1F45444EFE1D6D535CF1B692F815484D0A758E9"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/references/workflow-contract.md",
-                      "sha256":  "876D695F6679C39A06BC5814D34B9E2619CF77D1C0DF8C4C7802393583900402"
-                  },
-                  {
-                      "path":  "skills/vehicle-door-cae/SKILL.md",
-                      "sha256":  "23F776E1A208B031B77C3C03D3D5B99B00AD52210200A9352B91E2AEEDCA5264"
-                  },
-                  {
-                      "path":  "tcl/visualization/apply-functional-palette.tcl",
-                      "sha256":  "ABEBE9A53D7FA7B909DA9841803433CE29E43894F2D4E0C8B5DCA3730852DBD4"
-                  }
-              ]
+{
+  "schema_version": 1,
+  "package_name": "hypermesh-cae-agent",
+  "package_version": "0.5.6+codex.20260825",
+  "created_utc": "2026-08-27T04:24:53.1709371Z",
+  "source_root": "<package-root>",
+  "file_count": 44,
+  "required_entrypoints": [
+    ".codex-plugin/plugin.json",
+    "scripts/install-local.ps1",
+    "scripts/start-hypermesh-mcp.ps1",
+    "backend/hypermesh-runtime/hypermesh_mcp_server.py",
+    "backend/hypermesh-runtime/connector_review_panel.tcl"
+  ],
+  "installation_contract": [
+    "Target computer supplies Codex, Python, and HyperMesh.",
+    "scripts/install-local.ps1 creates a target-local virtual environment and configures Codex.",
+    "No source-machine path, model, result, runtime log, test, offline wheel, or development document is included."
+  ],
+  "files": [
+    {
+      "path": ".codex-plugin/plugin.json",
+      "sha256": "EBD9B1B590228AAD82E65125692BA38D417D3321E9C5F4B308C001E658285BB8"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "AE1E2C1966341AE33E2EA07DB510F90D49802367CF15757BF95B084724A071ED"
+    },
+    {
+      "path": "backend/hypermesh-runtime/connector_review_panel.tcl",
+      "sha256": "089E947CA18DBF2995A2123E8FDF16C181371943C20AE4FE5CB4952006865F4A"
+    },
+    {
+      "path": "backend/hypermesh-runtime/hypermesh_mcp_server.py",
+      "sha256": "7F3213ABB65BE0EFD02CEF69C8245A73EF1A1AB519A93BF8B22403D29878EB98"
+    },
+    {
+      "path": "backend/knowledge_runtime/__init__.py",
+      "sha256": "BAB50A85F295BF5E605871DB307E254FF457FEA84F64066525CC4E56B3C0B41F"
+    },
+    {
+      "path": "backend/knowledge_runtime/router.py",
+      "sha256": "9D5177A6FA4497158F7B801CF60D3D5AFA54C96459486F51EE96CD5D29224BA6"
+    },
+    {
+      "path": "backend/knowledge_runtime/store.py",
+      "sha256": "3C7BF261C0D12585299C375F0D12DFFC2B514403CA8ED110C85FD1979D7C41CB"
+    },
+    {
+      "path": "knowledge/cases/baobian_combine_split_pattern.json",
+      "sha256": "7AAB8382DC2BC5A31D4FC6837FFDA2669C70A957E95566BF5B26D728A5747260"
+    },
+    {
+      "path": "knowledge/cases/interface_outer_edge_mismerge_prevention.json",
+      "sha256": "76F18283A4292D1EDF9C530C178F38BFB824138A3831B27346EDD8D67E03618B"
+    },
+    {
+      "path": "knowledge/cases/interface_replace_after_boundary_alignment.json",
+      "sha256": "0ABEDBC318404F82CACABC6A1A0C6EBC7A302224DF1165A53FE218A16AB2E2AC"
+    },
+    {
+      "path": "knowledge/cases/quality_regression_stop_and_review.json",
+      "sha256": "4D7010EA1EBB23279A31C1C94EC903C09F33317BA041F231836067475C803C87"
+    },
+    {
+      "path": "knowledge/manifest.json",
+      "sha256": "1E47D51E2F7DDC7088F520C84B53649499EB32AC567B6FBB891D085FC57E2E61"
+    },
+    {
+      "path": "knowledge/procedures/baobian_quad_dominance_repair.json",
+      "sha256": "A14076AB6D15B97443382758764AD8A8E9464F040B776AEB2CC0B02106807D16"
+    },
+    {
+      "path": "knowledge/procedures/connector_reference_component_management.json",
+      "sha256": "5EA5F8C11327C37F3F7AEC189E244DB74126E04946C22A2143D0094FE66C5E36"
+    },
+    {
+      "path": "knowledge/procedures/global_mesh_quality_check.json",
+      "sha256": "747917CB68098C793BE37A804020EBB05F9F798B1312659D52E8E86E1CDACE5D"
+    },
+    {
+      "path": "knowledge/procedures/interface_connectivity_repair.json",
+      "sha256": "E2742A25AE23D32C874387AFF7A11B80B45A762F35675DB9E5A90B7C5473BF8A"
+    },
+    {
+      "path": "knowledge/procedures/mesh_preflight.json",
+      "sha256": "B1912284C435E223B90FD8EE095EA9C89850A9A136EF25B67BCFB1DC2DF56509"
+    },
+    {
+      "path": "knowledge/procedures/mesh_repair_review.json",
+      "sha256": "4AAA023883FF7326B7AE5EBC568F59762F15EDC7BA0213850ED61EE7C6D3DB33"
+    },
+    {
+      "path": "knowledge/procedures/vehicle_door_full_preprocess_workflow.json",
+      "sha256": "344A51FF735A4C175C763BA418858EA4DF0F8633E5D4E942AFE708545F1F6C68"
+    },
+    {
+      "path": "knowledge/rules/baobian_quad_dominance.json",
+      "sha256": "E8C11BA80E0512EE5B8ADC4B47C58F7B864ADF0E6145871BCCDE6D4522176306"
+    },
+    {
+      "path": "knowledge/rules/baobian_triangle_exception.json",
+      "sha256": "A7E2B0F12E5E7A6341A9311CE87BA9B6B33938712876B2B523C5399B12FB512F"
+    },
+    {
+      "path": "knowledge/rules/free_edge_classification.json",
+      "sha256": "98F415A3CC1F40398BF2ADE459FEB6315EFF07682F45AF9D318A805A397C7ED1"
+    },
+    {
+      "path": "knowledge/rules/model_file_lifecycle.json",
+      "sha256": "9FC80F114620B95F80B069C42AA36664F24DEBD913556E75222AC974110D5D8E"
+    },
+    {
+      "path": "knowledge/rules/node_merge_tolerance.json",
+      "sha256": "3959884F273E8D6E17D17F8A7D4DE4477F9AD22BF21B5E4BBE65CA4DE72009FA"
+    },
+    {
+      "path": "knowledge/rules/quality_profile_durability_5_0.json",
+      "sha256": "2C4D7F359049ED91D324264E9DAAB96F40D3749E50ECB2F4E37AF89A5F6B9C7D"
+    },
+    {
+      "path": "knowledge/sources/baobian-neiban-waiban-interface-guide.json",
+      "sha256": "7C887F8EAC1B35B59B9C99D4300EDA9BBC1CA279B9E7B172DAEE42ADC993F029"
+    },
+    {
+      "path": "README.md",
+      "sha256": "469C5722563C1F8204061B7EBC65C16E4D87DEB0CBAAB179FCF101EC4F347E90"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "14ED7E0275FE70EF8A9B1170D2BF1F53E477953A2E23DB4B8831FC8F2822A560"
+    },
+    {
+      "path": "scripts/check-environment.ps1",
+      "sha256": "80C17966DFF3798DA6CA54203CB36D578D83BBA7472B3D3908D936EA8EFC0384"
+    },
+    {
+      "path": "scripts/create-codex-mcp-snippet.ps1",
+      "sha256": "6A052E8EE34B836D86992DEBD5183A161E189C6ACCC2B5E0201EE47F3010AACD"
+    },
+    {
+      "path": "scripts/install-local.ps1",
+      "sha256": "65FA51CBDA1B7BE96B90E57DAA56585B29DB03A44C031C705493D67161BB2ED5"
+    },
+    {
+      "path": "scripts/start-hypermesh-mcp.ps1",
+      "sha256": "740D07FB7AD52228E465B81AB87808E5B03497A7C87725F3FED76BB659AD8BDD"
+    },
+    {
+      "path": "scripts/verify-package.ps1",
+      "sha256": "B956E45DE327711CC44122CF46A263956ACFF17FB408DA19B83DE5E2F2C06118"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/baobian-board-interface-guide.md",
+      "sha256": "B1952CD99E6F32E49C15F2D236F6D7974A2AF30AC6F22DAF8516509A77338C5C"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/baobian-interface-node-merge-guide.md",
+      "sha256": "B27C084E894D8F22905F282002777D17090E328EE6CF7FC61892974B3AD216C5"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/component-visual-palette.md",
+      "sha256": "BA94F6AB8ED2BADED1B27309B50AB04F38FED3C61B030D0DFA1F5CC15C316C3C"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/connector-reference-components-and-file-lifecycle.md",
+      "sha256": "3E77408C72ADA4C9F7FBB9FD2D1F078D80FFA59401B1E4E7F051C313BA859B3A"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/hypermesh17-constraints.md",
+      "sha256": "9873B32EE715DF823CB6EBCE7D116D401EE198C2CB4FED78F1302AE6F4441258"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/rbe2-review-lessons.md",
+      "sha256": "3675788DB40431DAE45466DE9AAF68AEB29C585E81B34294F5A1AB48C7EBDC01"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/vehicle-door-full-workflow.md",
+      "sha256": "993669A2019A61FB966F00AD6CAB8D8BCC22CC5AC170DED255F99FD6D1A732CD"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/references/workflow-contract.md",
+      "sha256": "876D695F6679C39A06BC5814D34B9E2619CF77D1C0DF8C4C7802393583900402"
+    },
+    {
+      "path": "skills/hypermesh-cae-agent/SKILL.md",
+      "sha256": "5053AFE0B08946466A978A8B18847DBD73BDA2B2AE6AD7C81C4FF5E1CC18066B"
+    },
+    {
+      "path": "tcl/visualization/apply-functional-palette.tcl",
+      "sha256": "ABEBE9A53D7FA7B909DA9841803433CE29E43894F2D4E0C8B5DCA3730852DBD4"
+    }
+  ]
 }

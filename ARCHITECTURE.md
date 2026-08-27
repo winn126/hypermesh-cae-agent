@@ -1,12 +1,19 @@
 # HyperMesh CAE Agent 架构导览
 
-> 面向 HyperMesh 17 车门 CAD→CAE 前处理的可迁移 Codex 插件。本文是交付包内的总览入口，说明“谁负责什么、状态在哪里、遇到问题先读什么”。
+> 面向 HyperMesh 17 的可迁移、可审计 CAE 工程师协同框架。当前以车门 CAD→CAE 前处理为已验证参考 Profile；本文说明“谁负责什么、状态在哪里、遇到问题先读什么”。
+
+## 0. 产品定位与成熟度
+
+`hypermesh-cae-agent` 的产品目标是把 Codex、MCP、HyperMesh Tcl、运行证据和工程师审核门组合成可复用的 CAE 协作框架，而不是把单一模型经验伪装成通用自动化。当前发行版已在车门 CAD→CAE 前处理上验证了连接、模型管理、中面、低风险清理、受控网格和连接审核链路；车门以外的模型仍需要工程师给出 Profile、标准和放行条件。
+
+因此，下面出现的 `baobian`、`neiban`、`waiban`、车门功能配色和七阶段流程均属于当前车门参考 Profile。平台层可迁移，但这些工程规则不能被自动外推到其他零部件、行业或企业标准。
 
 ## 1. 先记住三条边界
 
 1. **模型是 agent 的工作对象，代码是 harness。** Codex/模型负责理解意图、选择步骤、解释结果和提出工程师问题；代码负责提供确定性的工具、参数校验、Tcl 生成/执行、状态记录、回退和审计。
 2. **MCP 不是 HyperMesh 本身。** MCP 只负责把 Codex 与已经打开的 HyperMesh 17 会话连接起来。几何、网格、视图和最终 `.hm` 文件仍由 HyperMesh 保存。
-3. **自动化不等于跳过审核。** 模型管理、中面和受控网格划分可以由 agent 主导；包边拓扑、质量修复和连接创建必须停在工程师交接点。连接候选可以自动扫描和局部展示，但点焊、胶粘、RBE2 只有在工程师批准后才能创建。
+3. **Skill 工作流不等于跳过审核。** 当 agent 按当前 Skill/Profile 执行时，模型管理、中面和受控网格划分可以由 agent 主导；包边拓扑、质量修复和连接创建必须停在工程师交接点。连接候选可以自动扫描和局部展示，但点焊、胶粘、RBE2 只有在工程师批准后才能创建。
+4. **原始 MCP 工具不是工作流放行器。** `hypermesh_mcp_server.py` 仍提供用于受控执行和排障的原始 Tcl 原语；它们不能判断工程语义、替代 Profile 参数或自动批准操作。对外承诺的行为来自 Skill 合同、知识卡和工程师门控，而不是绕过这些层的直接调用。
 
 本文描述的是当前包的协作合同；具体模型的尺寸、容差、质量阈值、材料和求解器模板不能从组件名或颜色猜出来，必须由工程师给出或从已审计模型读回。
 
@@ -14,7 +21,7 @@
 
 ```mermaid
 flowchart LR
-    U[工程师 / Codex] --> S[vehicle-door-cae Skill]
+    U[工程师 / Codex] --> S[hypermesh-cae-agent Skill]
     S --> C[Codex 注册的 hypermesh-cae-agent MCP]
     C --> L[scripts/start-hypermesh-mcp.ps1]
     L --> P[目标电脑的包内 .venv Python]
@@ -29,7 +36,7 @@ flowchart LR
     V --> S
 ```
 
-### 一次工具调用的实际顺序
+### 一次受控 Skill 工作流的实际顺序
 
 1. Skill 先检查当前模型、HM 版本、输出目录、单位/标准和上一个阶段的验收状态。
 2. MCP server 将请求转成结构化参数；需要经验时先调用知识路由，返回匹配卡片、前置条件、后置验证和是否必须审核。
@@ -46,10 +53,10 @@ flowchart LR
 | 安装与启动 | `scripts/install-local.ps1`、`check-environment.ps1`、`start-hypermesh-mcp.ps1`、`create-codex-mcp-snippet.ps1` | 在目标电脑创建本地虚拟环境、保存工作站路径、预检并注册唯一 MCP；提供没有 `codex` 命令时的手工 TOML 兜底 | 第二个同名 MCP、开发机路径、全局 Python 依赖假设 |
 | MCP 运行时 | `backend/hypermesh-runtime/hypermesh_mcp_server.py` | FastMCP 工具、几何/网格/连接分析、Tcl 生成、GUI/批处理执行、运行记录和错误回退 | 把单个模型的 ID、组件名或工程师判断写死在通用循环里 |
 | HM17 交互层 | `connector_review_panel.tcl` | 在已打开的 HM17 会话中以同一审核面板提供点焊/胶粘/RBE2 扫描、局部显示和经批准的连接创建；RBE2 宏以经校验的 Base64 形式内嵌于该文件 | 再引入独立旧版面板、绕过审核直接创建连接 |
-| Codex 行为层 | `skills/vehicle-door-cae/SKILL.md` 及 `references/*.md` | 阶段门、HM17 兼容性、包边/节点合并、配色、连接审查和文件生命周期规则 | 当前模型的临时事实、未经证实的阈值 |
+| Codex 行为层 | `skills/hypermesh-cae-agent/SKILL.md` 及 `references/*.md` | 通用平台边界、阶段门、HM17 兼容性，以及当前车门 Profile 的包边/节点合并、配色、连接审查和文件生命周期规则 | 当前模型的临时事实、未经证实的阈值 |
 | 知识层 | `knowledge/manifest.json`、`procedures/`、`rules/`、`cases/`、`sources/`；运行时为 `backend/knowledge_runtime/` | 可迁移 JSON 知识卡、来源/经验等级、版本和组件范围过滤；查询结果可写入证据文件 | 把聊天记录或模型快照当作无来源的永久规则 |
 | 可复用 Tcl 资产 | `tcl/visualization/apply-functional-palette.tcl` | 经审查后按 component ID 应用功能配色，并立即回读验证颜色 | 不经模型核对就套用旧 ID 映射 |
-| 发布与自检（源仓库） | `scripts/new-release-package.ps1`、`scripts/verify-package.ps1` 及对应 `test-*.ps1` | 白名单构包、SHA-256 manifest、清理解压验证和安装/启动回归测试 | 把 `docs/`、`runs/`、模型、日志、wheel 或测试塞进最小交付包 |
+| 发布校验 | `RELEASE-MANIFEST.json`、`scripts/verify-package.ps1` | 验证已交付文件的白名单、SHA-256、插件元数据和无源机路径 | 把 `docs/`、`runs/`、模型、日志、wheel 或测试塞进最小交付包 |
 
 ### 3.1 最小交付包文件逐项注释
 
@@ -69,7 +76,7 @@ flowchart LR
 | backend/hypermesh-runtime/hypermesh_mcp_server.py | MCP 工具、Tcl 生成、运行记录、阶段 Save As 与异常处理 | 所有 Codex 到 HM17 的请求 |
 | backend/hypermesh-runtime/connector_review_panel.tcl | 唯一的点焊、胶粘、RBE2 审核界面与 RBE2 内嵌宏 | P07 扫描、审核与创建 |
 | backend/knowledge_runtime/ + knowledge/ | 可检索的流程、边界和工程师交接条件 | agent 需要选择流程或提示人工处理时 |
-| skills/vehicle-door-cae/ | 给 Codex 的操作合同和 HM17 专项经验 | 用户以自然语言请求车门前处理时 |
+| skills/hypermesh-cae-agent/ | 给 Codex 的通用操作合同和当前车门 Profile 经验 | 用户以自然语言请求 HyperMesh CAE 工作流时 |
 | tcl/visualization/apply-functional-palette.tcl | 已审查的功能配色执行资产 | 模型管理阶段已确认 component 映射后 |
 | RELEASE-MANIFEST.json | 构包时生成的文件哈希和最小安装合同 | 对比交付 ZIP 是否被漏改或污染时 |
 
@@ -88,9 +95,11 @@ flowchart LR
 
 本包**不包含** Nastran 材料、厚度或属性分配自动化；废弃的 `nastran_property_contract` 源码、测试与缓存均不在源交付内容和发行 ZIP 中。唯一保留的 `NastranTemplateDir` / `HYPERMESH_NASTRAN_TEMPLATE_DIR` 配置，只在点焊 connector realization 时帮助 HyperMesh 找到其 FE 模板。它不是 Nastran 属性功能，删除它会导致点焊创建失效。
 
-## 4. 车门工作流与责任边界
+## 4. 当前已验证的车门参考流程与责任边界
 
 阶段状态只能按 `not_started → agent_running → engineer_action_required / engineer_decision_required → accepted` 推进；agent 不能替工程师把后两种状态改成 `accepted`。
+
+下表说明当前车门 Profile 的成熟度，不承诺其已适配所有零部件、行业和企业标准。对其他模型，agent 只能在工程师提供 Profile、参数和验收条件后执行受控操作。
 
 | 阶段 | agent 可以做 | 必须由工程师决定/验收 |
 | --- | --- | --- |
@@ -121,8 +130,8 @@ flowchart LR
 | 4 | `scripts/install-local.ps1` | 安装器如何创建 `.venv`、迁移同名 MCP、保存工作站配置并安全回滚 |
 | 5 | `scripts/check-environment.ps1` | GUI、batch、Python、端口、模板和状态目录怎样预检 |
 | 6 | `scripts/start-hypermesh-mcp.ps1` | Codex 启动 MCP 时如何定位包根、注入环境变量并只使用包内 Python |
-| 7 | `skills/vehicle-door-cae/SKILL.md` | agent 在什么阶段可以做什么，哪些操作必须停下来交给工程师 |
-| 8 | `skills/vehicle-door-cae/references/workflow-contract.md` 与 `vehicle-door-full-workflow.md` | 每个阶段的输入、出口、Save As 和异常处理细节 |
+| 7 | `skills/hypermesh-cae-agent/SKILL.md` | 通用平台边界、当前车门 Profile 中 agent 可以做什么，以及哪些操作必须停下来交给工程师 |
+| 8 | `skills/hypermesh-cae-agent/references/workflow-contract.md` 与 `vehicle-door-full-workflow.md` | 每个阶段的输入、出口、Save As 和异常处理细节；后者是当前车门验证案例 |
 
 ### 5.2 要改运行能力时
 
@@ -138,9 +147,9 @@ flowchart LR
 
 | 顺序 | 文件 | 用途 |
 | ---: | --- | --- |
-| 14 | `scripts/new-release-package.ps1` | 只从白名单复制运行必需文件，生成 `RELEASE-MANIFEST.json` 和 ZIP |
-| 15 | `scripts/verify-package.ps1` | 检查缺失、越权文件、源机器路径、清单和 SHA-256 |
-| 16 | `scripts/test-*.ps1` | 用 fake Codex/临时目录验证安装、启动、迁移失败回滚和清理解压；这些测试留在源仓库，不随最小包交付 |
+| 14 | `RELEASE-MANIFEST.json` | 已交付文件的路径和 SHA-256 合同；不手工编辑 |
+| 15 | `scripts/verify-package.ps1` | 检查缺失、越权文件、源机器路径、清单与插件元数据一致性和 SHA-256 |
+| 16 | `README.md` 的“发布包校验” | 目标电脑从 ZIP 或 Git clone 获得该最小包后，应执行的正式验收路径 |
 
 ## 6. 状态和文件放在哪里
 
@@ -175,7 +184,7 @@ flowchart LR
 
 - 放在 `knowledge/procedures`、`rules`、`cases` 或 `sources`，遵守 `knowledge/schemas` 中的结构。
 - 必须写 HM 版本、适用组件/范围、来源等级、前置条件、验证项和 `requires_engineer_review`。
-- 先用 `scripts/build_knowledge_index.py` 重建索引并用 `scripts/query_knowledge.py` 验证命中；交付包不携带开发机生成的 SQLite 索引也应能工作。
+- 交付包不携带开发机生成的 SQLite 索引；先确认 JSON 卡能被文件扫描回退命中。若维护者开发环境另有索引构建工具，索引生成与查询必须在该源仓库中单独验证，不能把生成产物带入最小交付包。
 
 ## 8. 故障定位地图
 
@@ -197,7 +206,7 @@ flowchart LR
 3. 重启 Codex；在 HyperMesh 17 打开可丢弃模型，source Codex 为本次会话生成的 listener Tcl。
 4. 先做只读连接测试，再请求模型管理/中面/网格阶段；每个阶段确认 Save As 输出、Tcl、audit 和 manifest 都存在。
 5. 到 P07 时先扫描并打开统一审核面板；没有工程师明确批准，不创建连接。
-6. 若要验收迁移完整性，运行包内 `scripts/verify-package.ps1 -PackageRoot <解压目录>`；若要验收发布流程，在源仓库运行 `scripts/new-release-package.ps1 -Force`，它会自动做清理解压验证。
+6. 若要验收迁移完整性，运行包内 `scripts/verify-package.ps1 -PackageRoot <解压目录>`；`ready` 为 `true` 后再开始目标模型测试。
 
 达到“能安装、能注册唯一 MCP、能 source listener、能完成只读 ping、能写运行记录且不携带源机器路径”才算最小可复现；模型质量和工程交付仍需按阶段由工程师验收。
 

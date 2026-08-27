@@ -1,8 +1,8 @@
 {
   "id": "hm17.vehicle_door.full_preprocess",
   "kind": "procedure",
-  "title": "车门 HyperMesh 前处理端到端工程师—agent 协同流程",
-  "summary": "以阶段门控方式完成车门模型管理、中面抽取、几何清理、包边、网格、网格检查修复和连接创建。agent 只在被授权的阶段执行，工程师保留复杂几何、包边、网格修复和连接最终判断权。",
+  "title": "车门 HyperMesh 前处理端到端工程师—agent 协同流程（当前已验证 Profile）",
+  "summary": "这是 HyperMesh CAE Agent 当前已验证的车门 Profile：以阶段门控方式完成模型管理、中面抽取、几何清理、包边、网格、网格检查修复和连接创建。agent 只在被授权的阶段执行，工程师保留复杂几何、包边、网格修复和连接最终判断权；不得将这些车门规则外推为通用默认值。",
   "status": "active",
   "provenance": "engineer_confirmed",
   "confidence": "yellow",
@@ -133,5 +133,5 @@
     }
   ],
   "workflow_order": 1,
-  "updated_at": "2026-08-05"
+  "updated_at": "2026-08-27"
 }

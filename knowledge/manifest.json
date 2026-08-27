@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "knowledge_version": "0.6.0",
+  "knowledge_version": "0.6.1",
   "hm_versions": ["17"],
   "index_format": "sqlite-fts5-v1",
   "default_language": "zh-CN",
@@ -12,5 +12,5 @@
   ],
   "generated_paths": ["index/knowledge.db"],
   "excluded_from_index": ["schemas", "fixtures"],
-  "updated_at": "2026-08-05"
+  "updated_at": "2026-08-27"
 }

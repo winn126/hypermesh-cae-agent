@@ -197,8 +197,64 @@ function Test-HyperMeshCaeAgentSkillDirectory {
     }
     try {
         $content = [System.IO.File]::ReadAllText($skillFile, [System.Text.Encoding]::UTF8)
+        return $content -match '(?m)^name:\s*hypermesh-cae-agent\s*$' -and
+            $content -match '(?m)^<!-- hypermesh-cae-agent-managed-skill: v1 -->\s*$'
+    }
+    catch {
+        return $false
+    }
+}
+
+function Test-LegacyVehicleDoorCaeSkillDirectory {
+    param([Parameter(Mandatory = $true)][string]$SkillDirectory)
+
+    $skillFile = Join-Path $SkillDirectory 'SKILL.md'
+    if (-not (Test-Path -LiteralPath $skillFile -PathType Leaf)) {
+        return $false
+    }
+    try {
+        $content = [System.IO.File]::ReadAllText($skillFile, [System.Text.Encoding]::UTF8)
         return $content -match '(?m)^name:\s*vehicle-door-cae\s*$' -and
             $content -match '(?m)^description:\s*This skill should be used when planning, auditing, or executing the stage-gated vehicle-door CAD-to-CAE workflow through the HyperMesh CAE Agent plugin,'
+    }
+    catch {
+        return $false
+    }
+}
+
+function Test-SkillDirectoryHasNoReparsePoint {
+    param([Parameter(Mandatory = $true)][string]$SkillDirectory)
+
+    if (-not (Test-Path -LiteralPath $SkillDirectory)) {
+        return $true
+    }
+    try {
+        $items = @(
+            Get-Item -LiteralPath $SkillDirectory -Force -ErrorAction Stop
+            Get-ChildItem -LiteralPath $SkillDirectory -Force -Recurse -ErrorAction Stop
+        )
+        foreach ($item in $items) {
+            if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                return $false
+            }
+        }
+        return $true
+    }
+    catch {
+        return $false
+    }
+}
+
+function Test-DirectoryIsNotReparsePoint {
+    param([Parameter(Mandatory = $true)][string]$Directory)
+
+    if (-not (Test-Path -LiteralPath $Directory)) {
+        return $true
+    }
+    try {
+        $item = Get-Item -LiteralPath $Directory -Force -ErrorAction Stop
+        return $item.PSIsContainer -and
+            (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0)
     }
     catch {
         return $false
@@ -345,7 +401,9 @@ $requirementsPath = Join-Path $packageRoot 'requirements.txt'
 $snippetScript = Join-Path $PSScriptRoot 'create-codex-mcp-snippet.ps1'
 $checkScript = Join-Path $PSScriptRoot 'check-environment.ps1'
 $launcher = Join-Path $PSScriptRoot 'start-hypermesh-mcp.ps1'
-$skillSource = Join-Path $packageRoot 'skills\vehicle-door-cae'
+$skillName = 'hypermesh-cae-agent'
+$legacySkillName = 'vehicle-door-cae'
+$skillSource = Join-Path $packageRoot "skills\$skillName"
 
 if ([string]::IsNullOrWhiteSpace($StateDirectory)) {
     $StateDirectory = Join-Path $packageRoot '.local'
@@ -408,15 +466,47 @@ $workstationConfig = [ordered]@{
 $workstationConfig | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $workstationConfigPath -Encoding utf8
 
 $shouldInstallSkill = -not $SkipSkillInstall
+$legacySkillMigration = 'not_checked'
+$removeLegacySkill = $false
 if ($shouldInstallSkill) {
-    $skillDestination = Join-Path $CodexHome 'skills\vehicle-door-cae'
+    $skillsRoot = Join-Path $CodexHome 'skills'
+    if (-not (Test-DirectoryIsNotReparsePoint -Directory $skillsRoot)) {
+        throw "Codex Skills root is a reparse point and will not be modified: $skillsRoot"
+    }
+    $skillDestination = Join-Path $skillsRoot $skillName
+    $legacySkillDestination = Join-Path $skillsRoot $legacySkillName
     if (Test-Path -LiteralPath $skillDestination) {
+        if (-not (Test-SkillDirectoryHasNoReparsePoint -SkillDirectory $skillDestination)) {
+            throw "Codex Skill destination contains a reparse point and will not be modified: $skillDestination"
+        }
         if (-not $Force) {
             throw "Codex Skill destination already exists: $skillDestination. Re-run with -Force after reviewing it."
         }
         if (-not (Test-HyperMeshCaeAgentSkillDirectory -SkillDirectory $skillDestination)) {
             throw "Codex Skill destination is not a verifiable HyperMesh CAE Agent Skill and will not be replaced: $skillDestination"
         }
+    }
+    if (Test-Path -LiteralPath $legacySkillDestination) {
+        if (-not (Test-SkillDirectoryHasNoReparsePoint -SkillDirectory $legacySkillDestination)) {
+            $legacySkillMigration = 'retained_reparse_point'
+            Write-Warning "Legacy Skill path contains a reparse point and will be left untouched: $legacySkillDestination"
+        }
+        elseif (Test-LegacyVehicleDoorCaeSkillDirectory -SkillDirectory $legacySkillDestination) {
+            if ($Force) {
+                $removeLegacySkill = $true
+                $legacySkillMigration = 'pending_removal'
+            }
+            else {
+                throw "Verified legacy HyperMesh CAE Agent Skill exists: $legacySkillDestination. Re-run with -Force to migrate it without leaving two Skill versions installed."
+            }
+        }
+        else {
+            $legacySkillMigration = 'retained_unverified'
+            Write-Warning "Legacy Skill path is not a verifiable HyperMesh CAE Agent Skill and will be left untouched: $legacySkillDestination"
+        }
+    }
+    else {
+        $legacySkillMigration = 'not_found'
     }
 }
 else {
@@ -472,6 +562,13 @@ if ($shouldInstallSkill) {
     # Complete the local Skill install before changing Codex MCP registrations.
     # A failed copy or ownership check must never leave a migrated MCP behind.
     New-Item -ItemType Directory -Path (Split-Path -Parent $skillDestination) -Force | Out-Null
+    if (-not (Test-DirectoryIsNotReparsePoint -Directory (Split-Path -Parent $skillDestination))) {
+        throw "Codex Skills root is a reparse point and will not be modified: $(Split-Path -Parent $skillDestination)"
+    }
+    if ((Test-Path -LiteralPath $skillDestination) -and
+        -not (Test-SkillDirectoryHasNoReparsePoint -SkillDirectory $skillDestination)) {
+        throw "Codex Skill destination contains a reparse point and will not be modified: $skillDestination"
+    }
     if (-not (Test-Path -LiteralPath $skillDestination)) {
         Copy-Item -LiteralPath $skillSource -Destination $skillDestination -Recurse -Force
     }
@@ -482,6 +579,16 @@ if ($shouldInstallSkill) {
     }
     if (-not (Test-HyperMeshCaeAgentSkillDirectory -SkillDirectory $skillDestination)) {
         throw "Codex Skill installation did not produce a verifiable HyperMesh CAE Agent Skill: $skillDestination"
+    }
+    if ($removeLegacySkill) {
+        if (-not (Test-SkillDirectoryHasNoReparsePoint -SkillDirectory $legacySkillDestination)) {
+            throw "Verified legacy HyperMesh CAE Agent Skill contains a reparse point and will not be removed: $legacySkillDestination"
+        }
+        Remove-Item -LiteralPath $legacySkillDestination -Recurse -Force
+        if (Test-Path -LiteralPath $legacySkillDestination) {
+            throw "Verified legacy HyperMesh CAE Agent Skill could not be removed: $legacySkillDestination"
+        }
+        $legacySkillMigration = 'removed'
     }
 }
 
@@ -672,6 +779,7 @@ $result = [ordered]@{
     workstation_config = $workstationConfigPath
     codex_mcp_snippet = $snippetPath
     codex_skill_destination = $skillDestination
+    legacy_skill_migration = $legacySkillMigration
     mcp_registration = $mcpRegistration
     python_executable = $runtimePython
     hypermesh_gui_exe = $guiExe

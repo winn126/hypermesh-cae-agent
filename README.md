@@ -1,12 +1,32 @@
 # HyperMesh CAE Agent
 
-可移植的 HyperMesh 17 车门前处理助手：Codex 通过本地 MCP 驱动 HyperMesh，并保留工程师审核边界。
+面向 HyperMesh 17 的可审计 CAE 工程师协同框架：Codex 通过本地 MCP 驱动 HyperMesh；按本包 Skill 执行的模型变更必须遵守工程师审核边界。当前发行版以车门 CAD→CAE 前处理作为已验证参考实现，产品目标是逐步扩展为可配置的通用 HyperMesh CAE Agent。
 
-该包保留 MCP、GUI 监听、车门工作流 Skill、知识卡、配色模板、点焊、胶粘、RBE2。未包含 HyperMesh、Codex、Python、模型、网格结果或历史运行记录。MCP 服务和启动脚本包含在包内；旧式 .mcp.json 因含机器绝对路径而不交付，改由目标电脑的安装脚本注册唯一 MCP。
+该包保留 MCP、GUI listener、通用 Agent Skill、知识卡、配色模板、点焊、胶粘和 RBE2 审核面板。未包含 HyperMesh、Codex、Python、模型、网格结果或历史运行记录。MCP 服务和启动脚本包含在包内；旧式 `.mcp.json` 因含机器绝对路径而不交付，改由目标电脑的安装脚本注册唯一 MCP。
 
 完整软件架构、核心文件职责和推荐阅读顺序见 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
-## 运行边界
+## 产品目标
+
+将 HyperMesh 的确定性 Tcl 操作、可追溯运行记录和工程师判断结合起来：agent 负责连接、受控执行、读回验证、保存证据和提示下一步；工程师负责模型语义、企业标准、例外判断和最终放行。后续通用化通过新增经过验证的流程 Profile、质量标准卡和审核门来实现，而不是把车门经验直接套用到所有模型。
+
+## 当前已验证能力（车门参考实现）
+
+| 能力 | 当前可做的内容 |
+| --- | --- |
+| 连接与审计 | 创建 HM17 GUI listener、检查 MCP 连接、保存 Tcl/日志/audit，并按 Skill 合同在大步骤前 Save As 到新 `.hm` 文件 |
+| 模型管理 | 组件清点、经工程师确认后的命名和功能配色、连接参考几何归类 |
+| 前处理 | 对未网格化 solid 与可确认的单层 surface 抽中面；执行低风险 Auto Cleanup 与问题扫描；按 component 独立运行 BatchMesh/受控回退 |
+| 连接审核 | 扫描并局部展示点焊、胶粘、RBE2 候选，支持人工审核和补加；只对已批准候选创建连接 |
+| 工程师协同 | 对包边、局部网格修复、网格质量、节点共用和异常连接提供定位、证据与局部操作建议，保留工程师决策门 |
+
+MCP 的原始 Tcl 工具是执行原语，不会替工程师判断模型语义或自动批准每一步。Codex 必须通过本包 Skill 和相应 Profile 使用它们；直接绕过流程合同的原始调用不属于本产品承诺的安全工作流。
+
+## 通用化目标与当前边界
+
+当前包不是“任何 CAD、任何行业、全自动完成”的承诺。尚未泛化或不在包内的能力包括：跨行业组件语义识别、任意 CAD 特征理解、全自动包边、全自动网格质量修复与最终放行、材料/厚度/求解器属性自动化，以及未经工程师批准的连接创建。非车门模型必须由工程师提供相应 Profile、尺寸/容差/质量标准和验收条件后再执行模型变更。
+
+## 当前车门参考流程的运行边界
 
 | 阶段 | 责任 |
 | --- | --- |
@@ -14,7 +34,7 @@
 | 包边、局部网格修复、网格质量判定 | 工程师主导，Agent 提供检查和局部协助 |
 | 点焊、胶粘、RBE2 | Agent 扫描和展示；工程师审核后才允许创建 |
 
-每个大步骤必须另存为带日期、阶段和操作名的新 HM 文件；保留原始输入，只在已验证输出存在后删除本阶段的恢复文件。
+本 Skill 合同要求每个大步骤另存为带日期、阶段和操作名的新 HM 文件；保留原始输入，只在已验证输出存在后删除本阶段的恢复文件。
 
 ## 前置条件
 
@@ -46,13 +66,13 @@
 .\scripts\install-local.ps1 -HyperMeshGuiExe 'C:\...\hw.exe' -NastranTemplateDir 'C:\...\templates\feoutput\nastran\general'
 ~~~
 
-安装脚本会创建包内 .venv、在线安装已锁定兼容版本的 MCP 运行时、写入本机 .local\workstation.json、把车门 Skill 安装到当前 Codex 主目录，并用 codex mcp add 注册唯一的 hypermesh-cae-agent MCP。MCP 运行时只使用该包的 .venv，不依赖全局 Python。运行日志和生成 Tcl 会写入 %LOCALAPPDATA%\HyperMeshCAEAgent\runs，不会写回交付包。
+安装脚本会创建包内 `.venv`、在线安装已锁定兼容版本的 MCP 运行时、写入本机 `.local\workstation.json`、把 `hypermesh-cae-agent` Skill 安装到当前 Codex 主目录，并用 `codex mcp add` 注册唯一的 `hypermesh-cae-agent` MCP。MCP 运行时只使用该包的 `.venv`，不依赖全局 Python。运行日志和生成 Tcl 会写入 `%LOCALAPPDATA%\HyperMeshCAEAgent\runs`，不会写回交付包。
 
 这是唯一的正式安装路径：不要再单独执行 codex plugin add 或手工添加第二个同名 MCP。若已通过其他途径加载过同一 Skill，仅用于迁移时可增加 -SkipSkillInstall，避免重复加载。
 
 若检测到本包旧名 hypermesh-mcp-server、同名 MCP 或 Skill，先检查它是否正在使用；确认替换后增加 -Force。-Force 只迁移可验证为 HyperMesh CAE Agent 的旧注册：必须是 `powershell.exe` 以受限参数通过 `-File start-hypermesh-mcp.ps1` 启动，并且 `codex mcp get --json` 未包含工具筛选、自定义超时、工作目录、继承环境变量或禁用状态。安装器会在删除前再次比对完整快照；无法证明归属、无法完整恢复或在迁移中发生变化的注册一律不自动删除，并提示人工处理。迁移中的新注册失败时，安装器只会删除与本次快照一致的临时注册，再恢复旧注册；若恢复不完整会明确报错。安装过程中不要在另一终端修改 Codex MCP 配置。
 
-同名 Skill 也不会被递归删除：只有其 `SKILL.md` 可验证为本包的 vehicle-door-cae Skill 时，-Force 才会原地更新包内文件；无法验证的同名目录保持不动并停止安装。不要添加 .mcp.json，也不要同时手工再注册一个同名 MCP。
+同名通用 Skill 也不会被递归删除：只有其 `SKILL.md` 可验证为本包的 `hypermesh-cae-agent` Skill 时，`-Force` 才会原地更新。升级时，若发现可验证归属的旧 `vehicle-door-cae` Skill，必须使用 `-Force` 执行迁移；安装器会在新 Skill 已验证安装成功后删除旧 Skill，避免 Codex 同时加载两套规则。无法验证的旧目录一律保留并给出 warning。不要添加 `.mcp.json`，也不要同时手工再注册一个同名 MCP。
 
 ## 安装验证
 
@@ -92,7 +112,7 @@ source "本次 Codex 返回的 listener Tcl 完整路径"
 
 1. install-local.ps1 成功，且 .venv 中存在 mcp==1.27.1；
 2. codex mcp get hypermesh-cae-agent 可见唯一 MCP；
-3. Codex 能识别 vehicle-door-cae Skill；
+3. Codex 能识别 `hypermesh-cae-agent` Skill；
 4. check-environment.ps1 -AsJson 报告 GUI 或 batch 模式可用；
 5. 可创建并 source GUI listener，读写测试只返回 MCP_PING_OK；
 6. 可在不创建连接的条件下打开统一审核面板并扫描点焊、胶粘、RBE2；
@@ -114,21 +134,21 @@ source "本次 Codex 返回的 listener Tcl 完整路径"
 
 ~~~powershell
 codex mcp remove hypermesh-cae-agent
-# 仅在确认下列目录仍是本包的 vehicle-door-cae Skill 后再删除：
-Remove-Item "$env:USERPROFILE\.codex\skills\vehicle-door-cae" -Force -Recurse
+# 仅在确认下列目录仍是本包的 hypermesh-cae-agent Skill 后再删除：
+Remove-Item "$env:USERPROFILE\.codex\skills\hypermesh-cae-agent" -Force -Recurse
 ~~~
 
 确认没有任务正在使用该 MCP 后，再删除包目录；运行记录可按需从 %LOCALAPPDATA%\HyperMeshCAEAgent\runs 清理。
 
-## 生成正式交付包
+## 发布包校验
 
-开发目录中运行：
+收到 ZIP 或从 Git 克隆后，先在包根目录执行：
 
 ~~~powershell
-.\scripts\new-release-package.ps1
+.\scripts\verify-package.ps1 -PackageRoot . -AsJson
 ~~~
 
-脚本会在上级 delivery 目录生成白名单压缩包、写入清单并自检。交付该 ZIP，不要手工复制开发目录。
+结果中的 `ready` 必须为 `true`。该最小交付包只负责安装和验证，发布构建工具保留在维护者的开发环境中；不要手工编辑 `RELEASE-MANIFEST.json`，也不要把开发目录、模型或运行记录直接交付给他人。
 
 交付包只包含运行所需的统一连接审核面板 `connector_review_panel.tcl`；RBE2 创建宏已内嵌并带校验注释，不包含旧的独立点焊/胶粘/RBE2 面板或外部 `.tbc` 宏。开发仓库中的 `testmodel/`、`.hm`、`.docx` 和历史运行记录只用于测试与追溯，均不属于正式交付物；验收时请使用目标电脑上的可丢弃模型。
 

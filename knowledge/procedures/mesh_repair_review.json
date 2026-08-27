@@ -23,7 +23,7 @@
   ],
   "risk": "medium",
   "requires_engineer_review": true,
-  "evidence": [{"type": "workflow_contract", "ref": "skills/vehicle-door-cae/references/workflow-contract.md"}],
+  "evidence": [{"type": "workflow_contract", "ref": "skills/hypermesh-cae-agent/references/workflow-contract.md"}],
   "workflow_order": 50,
-  "updated_at": "2026-07-31"
+  "updated_at": "2026-08-27"
 }

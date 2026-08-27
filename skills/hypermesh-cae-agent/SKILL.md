@@ -1,9 +1,26 @@
 ---
-name: vehicle-door-cae
-description: This skill should be used when planning, auditing, or executing the stage-gated vehicle-door CAD-to-CAE workflow through the HyperMesh CAE Agent plugin, including model management, midsurface extraction, cleanup handoff, baobian handoff, 2D meshing, mesh-review assistance, shared-node alignment, and engineer-reviewed connections.
+name: hypermesh-cae-agent
+description: This skill should be used when planning, auditing, or executing a stage-gated HyperMesh 17 CAE workflow through the HyperMesh CAE Agent plugin. Its currently validated reference profile is vehicle-door CAD-to-CAE pre-processing, including model management, midsurface extraction, cleanup handoff, baobian handoff, 2D meshing, mesh-review assistance, shared-node alignment, and engineer-reviewed connections.
 ---
 
-# Vehicle-door CAE Workflow
+<!-- hypermesh-cae-agent-managed-skill: v1 -->
+
+# HyperMesh CAE Agent
+
+## Product scope and profile boundary
+
+This is the package-level Skill for an auditable, engineer-collaborative
+HyperMesh 17 CAE workflow. It is designed to host multiple model profiles;
+it must not claim that every HyperMesh request or industry model has already
+been validated.
+
+The vehicle-door CAD-to-CAE workflow in `references/vehicle-door-full-workflow.md`
+is the current validated reference profile. Its baobian, neiban, waiban,
+palette, mesh, and connector rules are profile-specific engineering knowledge,
+not universal defaults. For a model outside that profile, use only the general
+platform capabilities (connection, inventory, run evidence, explicit Save As,
+and engineer-reviewed connector scanning) until an engineer supplies or
+approves an applicable profile, model standard, and acceptance criteria.
 
 ## Required checks
 

@@ -1,4 +1,6 @@
-# 车门 HyperMesh Agent 端到端协同流程（HM17）
+# 车门 HyperMesh Agent 端到端协同流程（HM17，当前已验证 Profile）
+
+> 这是 HyperMesh CAE Agent 当前已验证的车门参考实现，不是对所有零部件、行业标准或 CAD 语义的通用承诺。通用平台能力与其他 Profile 的扩展边界见包根目录 `README.md` 和 `ARCHITECTURE.md`。
 
 ## 目的
 

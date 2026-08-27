@@ -1,7 +1,7 @@
 {
   "name": "hypermesh-cae-agent",
   "version": "0.5.6+codex.20260825",
-  "description": "Auditable HyperMesh 17 vehicle-door pre-processing with review-gated connectors.",
+  "description": "Auditable HyperMesh 17 CAE pre-processing and connector-review framework; vehicle door is the current reference profile.",
   "author": {
     "name": "Local CAE Team"
   },
@@ -9,7 +9,8 @@
   "keywords": [
     "hypermesh",
     "cae",
-    "vehicle-door",
+    "preprocessing",
+    "mesh",
     "connectors",
     "rbe2",
     "tcl"
@@ -17,8 +18,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "HyperMesh CAE Agent",
-    "shortDescription": "Auditable HyperMesh 17 vehicle-door workflow.",
-    "longDescription": "Starts a local HyperMesh MCP service and supplies stage-gated, auditable vehicle-door CAD-to-CAE guidance with a unified point-weld, adhesive, and RBE2 review panel.",
+    "shortDescription": "Auditable HyperMesh 17 CAE workflow with engineer review gates.",
+    "longDescription": "Starts a local HyperMesh MCP service and supplies stage-gated, auditable CAE guidance with a unified point-weld, adhesive, and RBE2 review panel. The currently validated reference profile is vehicle-door CAD-to-CAE pre-processing.",
     "developerName": "Local CAE Team",
     "category": "Productivity",
     "capabilities": [

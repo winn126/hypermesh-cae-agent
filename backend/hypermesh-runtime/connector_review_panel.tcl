@@ -2578,7 +2578,7 @@ proc ::mcp_spot_weld_review::highlight_current {candidate} {
 }
 
 proc ::mcp_spot_weld_review::focus_current {candidate} {
-    # Fit around the marker rather than the full vehicle-sized components, so
+    # Fit around the marker rather than the full model-sized components, so
     # the highlighted weld point remains visible while it is reviewed.
     set center [dict get $candidate center]
     if {[llength $center] != 3} {return}

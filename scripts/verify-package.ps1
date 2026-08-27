@@ -68,15 +68,15 @@ function Test-AllowedRelativePath {
         'backend\knowledge_runtime\router.py',
         'backend\knowledge_runtime\store.py',
         'knowledge\manifest.json',
-        'skills\vehicle-door-cae\skill.md',
-        'skills\vehicle-door-cae\references\baobian-board-interface-guide.md',
-        'skills\vehicle-door-cae\references\baobian-interface-node-merge-guide.md',
-        'skills\vehicle-door-cae\references\component-visual-palette.md',
-        'skills\vehicle-door-cae\references\connector-reference-components-and-file-lifecycle.md',
-        'skills\vehicle-door-cae\references\hypermesh17-constraints.md',
-        'skills\vehicle-door-cae\references\rbe2-review-lessons.md',
-        'skills\vehicle-door-cae\references\vehicle-door-full-workflow.md',
-        'skills\vehicle-door-cae\references\workflow-contract.md',
+        'skills\hypermesh-cae-agent\SKILL.md',
+        'skills\hypermesh-cae-agent\references\baobian-board-interface-guide.md',
+        'skills\hypermesh-cae-agent\references\baobian-interface-node-merge-guide.md',
+        'skills\hypermesh-cae-agent\references\component-visual-palette.md',
+        'skills\hypermesh-cae-agent\references\connector-reference-components-and-file-lifecycle.md',
+        'skills\hypermesh-cae-agent\references\hypermesh17-constraints.md',
+        'skills\hypermesh-cae-agent\references\rbe2-review-lessons.md',
+        'skills\hypermesh-cae-agent\references\vehicle-door-full-workflow.md',
+        'skills\hypermesh-cae-agent\references\workflow-contract.md',
         'tcl\visualization\apply-functional-palette.tcl'
     )
     if ($staticPaths -contains $normalized) {
@@ -126,15 +126,15 @@ try {
         'knowledge\procedures\vehicle_door_full_preprocess_workflow.json',
         'knowledge\cases\baobian_combine_split_pattern.json',
         'knowledge\sources\baobian-neiban-waiban-interface-guide.json',
-        'skills\vehicle-door-cae\SKILL.md',
-        'skills\vehicle-door-cae\references\baobian-board-interface-guide.md',
-        'skills\vehicle-door-cae\references\baobian-interface-node-merge-guide.md',
-        'skills\vehicle-door-cae\references\component-visual-palette.md',
-        'skills\vehicle-door-cae\references\connector-reference-components-and-file-lifecycle.md',
-        'skills\vehicle-door-cae\references\hypermesh17-constraints.md',
-        'skills\vehicle-door-cae\references\rbe2-review-lessons.md',
-        'skills\vehicle-door-cae\references\vehicle-door-full-workflow.md',
-        'skills\vehicle-door-cae\references\workflow-contract.md',
+        'skills\hypermesh-cae-agent\SKILL.md',
+        'skills\hypermesh-cae-agent\references\baobian-board-interface-guide.md',
+        'skills\hypermesh-cae-agent\references\baobian-interface-node-merge-guide.md',
+        'skills\hypermesh-cae-agent\references\component-visual-palette.md',
+        'skills\hypermesh-cae-agent\references\connector-reference-components-and-file-lifecycle.md',
+        'skills\hypermesh-cae-agent\references\hypermesh17-constraints.md',
+        'skills\hypermesh-cae-agent\references\rbe2-review-lessons.md',
+        'skills\hypermesh-cae-agent\references\vehicle-door-full-workflow.md',
+        'skills\hypermesh-cae-agent\references\workflow-contract.md',
         'tcl\visualization\apply-functional-palette.tcl',
         'RELEASE-MANIFEST.json'
     )
@@ -192,10 +192,27 @@ try {
             elseif ([string]::IsNullOrWhiteSpace([string]$manifest.package_name)) {
                 $manifestError = 'RELEASE-MANIFEST.json must declare package_name.'
             }
+            elseif ([string]::IsNullOrWhiteSpace([string]$manifest.package_version)) {
+                $manifestError = 'RELEASE-MANIFEST.json must declare package_version.'
+            }
             elseif ($null -eq $manifest.files -or @($manifest.files).Count -eq 0) {
                 $manifestError = 'RELEASE-MANIFEST.json must declare a non-empty files array.'
             }
             else {
+                $pluginManifestPath = Join-Path $root '.codex-plugin\plugin.json'
+                try {
+                    $pluginManifest = Get-Content -LiteralPath $pluginManifestPath -Raw | ConvertFrom-Json -ErrorAction Stop
+                    if ([string]$manifest.package_name -ne [string]$pluginManifest.name) {
+                        $manifestFileErrors += 'RELEASE-MANIFEST.json package_name does not match .codex-plugin/plugin.json.'
+                    }
+                    if ([string]$manifest.package_version -ne [string]$pluginManifest.version) {
+                        $manifestFileErrors += 'RELEASE-MANIFEST.json package_version does not match .codex-plugin/plugin.json.'
+                    }
+                }
+                catch {
+                    $manifestFileErrors += "Unable to validate .codex-plugin/plugin.json against RELEASE-MANIFEST.json: $($_.Exception.Message)"
+                }
+
                 $manifestPaths = @()
                 foreach ($entry in @($manifest.files)) {
                     $entryPath = [string]$entry.path

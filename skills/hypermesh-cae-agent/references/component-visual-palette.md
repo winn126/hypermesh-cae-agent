@@ -50,7 +50,9 @@ or review states rather than ordinary production parts.
 
 ## Example visual mapping
 
-For a door with a blue inner panel, orange outer skin, green upper sheet, red
-weld and adhesive entities, and violet repeated clips, populate the template
-with the reviewed component IDs. The template deliberately has no model-
-specific IDs so that it cannot recolour the wrong model by default.
+For the current vehicle-door reference profile, use a blue inner panel, orange
+outer skin, green upper sheet, red weld and adhesive entities, and violet
+repeated clips. Populate the template with reviewed component IDs. The
+template deliberately has no model-specific IDs so that it cannot recolour the
+wrong model by default. Other model profiles must define their own reviewed
+role-to-colour mapping rather than inheriting vehicle-door semantics.
