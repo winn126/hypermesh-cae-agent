@@ -2,6 +2,10 @@
 
 面向 HyperMesh 17 的可审计 CAE 工程师协同框架：Codex 通过本地 MCP 驱动 HyperMesh；按本包 Skill 执行的模型变更必须遵守工程师审核边界。当前发行版以车门 CAD→CAE 前处理作为已验证参考实现，产品目标是逐步扩展为可配置的通用 HyperMesh CAE Agent。
 
+## 项目共同创作者
+
+- @zzhh-707
+
 该包保留 MCP、GUI listener、通用 Agent Skill、知识卡、配色模板、点焊、胶粘和 RBE2 审核面板。未包含 HyperMesh、Codex、Python、模型、网格结果或历史运行记录。MCP 服务和启动脚本包含在包内；旧式 `.mcp.json` 因含机器绝对路径而不交付，改由目标电脑的安装脚本注册唯一 MCP。
 
 完整软件架构、核心文件职责和推荐阅读顺序见 [ARCHITECTURE.md](ARCHITECTURE.md)。

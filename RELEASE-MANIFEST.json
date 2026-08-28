@@ -2,7 +2,7 @@
   "schema_version": 1,
   "package_name": "hypermesh-cae-agent",
   "package_version": "0.5.6+codex.20260825",
-  "created_utc": "2026-08-27T04:24:53.1709371Z",
+  "created_utc": "2026-08-28T14:00:40.2079012Z",
   "source_root": "<package-root>",
   "file_count": 44,
   "required_entrypoints": [
@@ -124,7 +124,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "469C5722563C1F8204061B7EBC65C16E4D87DEB0CBAAB179FCF101EC4F347E90"
+      "sha256": "5F4F910F0EC1456D4E80E92B59FC8C57ABE58F98F9C6E19ED81CCA8F1E3E7E5F"
     },
     {
       "path": "requirements.txt",
